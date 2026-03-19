@@ -283,6 +283,7 @@ document.getElementById('form-login').addEventListener('submit', (e) => {
         localStorage.setItem('gim_rol', u.rol);
         localStorage.setItem('gim_user_name', u.name);
         localStorage.setItem('gim_gym_id', u.gym_id);
+        localStorage.setItem('gim_email', u.email); // Fix applied here
         window.location.reload();
     } else {
         alert('Email o contraseña incorrecta');
