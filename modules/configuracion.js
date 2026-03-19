@@ -56,7 +56,9 @@ if(btnLoadDemoSaas) {
                 return socio && socio.gym_id !== activeGymId; // rough logic, should strictly filter
             });
             window.generateTestData(true); // defined in app.js
-            window.location.reload();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000); // Darle 1 segundo a Firebase para que envíe los datos antes de matar la ventana
         }
     });
 }
