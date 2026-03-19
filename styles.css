@@ -90,7 +90,7 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 }
 .login-image {
     flex: 1;
-    background: url('file:///C:/Users/Usuario/.gemini/antigravity/brain/a1f9b82d-12c0-4419-9434-0068a8fe1df4/login_bg_1773867095562.png') center/cover;
+    background: url('./assets/login_bg_1773867095562.png') center/cover;
     position: relative;
     display: flex;
     align-items: flex-end;
