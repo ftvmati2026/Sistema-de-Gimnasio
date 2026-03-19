@@ -60,7 +60,9 @@ if(btnLoadDemoSaas) {
                 await window.generateTestData(true); // wait natively for Firebase to acknowledge the save
                 
                 alert("✅ Los 15 usuarios han sido inyectados y guardados con éxito en la Nube de Firebase.");
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1200);
             } catch(e) {
                 console.error(e);
                 alert("❌ Falló la inyección. Firebase devolvió un error de permisos o desconexión. Asegurate de que las Reglas de Firebase digan 'allow read, write: if true;'");
