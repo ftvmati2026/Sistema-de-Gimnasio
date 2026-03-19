@@ -76,12 +76,7 @@
                 </div>
                 <div id="real-time-clock" style="font-size:1rem; color:var(--success); font-weight:bold;"></div>
                 <div class="header-user" style="gap:20px; align-items:center;">
-                    <div style="display:flex; gap:8px;">
-                        <button onclick="document.body.className=''; localStorage.setItem('gim_theme', '')" style="width:20px; height:20px; background:#D4AF37; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Black Gold"></button>
-                        <button onclick="document.body.className='theme-neon-green'; localStorage.setItem('gim_theme', 'theme-neon-green')" style="width:20px; height:20px; background:#39FF14; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Neon Green"></button>
-                        <button onclick="document.body.className='theme-yellow-power'; localStorage.setItem('gim_theme', 'theme-yellow-power')" style="width:20px; height:20px; background:#FACC15; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Yellow Power"></button>
-                        <button onclick="document.body.className='light-theme'; localStorage.setItem('gim_theme', 'light-theme')" style="width:20px; height:20px; background:#FFF; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Clean White"></button>
-                    </div>
+                    <button class="btn btn-icon" id="btn-theme" title="Modo Claro/Oscuro"><i class="ph ph-sun"></i></button>
                     <div class="user-info" style="display:flex; gap:5px;">
                         <span class="text-secondary text-sm">Hola,</span>
                         <strong id="active-user-name">Usuario</strong>

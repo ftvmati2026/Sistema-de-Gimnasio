@@ -241,9 +241,19 @@ if(localStorage.getItem('gim_logged')) {
 }
 
 // Tema y Reloj Global
-const savedTheme = localStorage.getItem('gim_theme');
-if (savedTheme) {
-    document.body.className = savedTheme;
+const btnTheme = document.getElementById('btn-theme');
+if (localStorage.getItem('gim_theme') === 'light-theme') {
+    document.body.className = 'light-theme';
+    if(btnTheme) btnTheme.innerHTML = '<i class="ph ph-moon"></i>';
+} else {
+    document.body.className = '';
+}
+if(btnTheme) {
+    btnTheme.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light-theme');
+        localStorage.setItem('gim_theme', isLight ? 'light-theme' : '');
+        btnTheme.innerHTML = isLight ? '<i class="ph ph-moon"></i>' : '<i class="ph ph-sun"></i>';
+    });
 }
 
 const clockEl = document.getElementById('real-time-clock');
