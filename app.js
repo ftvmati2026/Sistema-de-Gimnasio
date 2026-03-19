@@ -33,6 +33,7 @@ window.appData = {
             console.log("Sincronización Cloud ✅ Completada");
         } catch(e) {
             console.error("Error al sincronizar con la Nube:", e);
+            throw new Error("FIREBASE_PERMISSION_DENIED");
         }
     }
 };
