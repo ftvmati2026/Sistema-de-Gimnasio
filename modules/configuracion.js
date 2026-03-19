@@ -38,7 +38,7 @@ if(formConfigGym) {
 // System Actions
 const btnLoadDemoSaas = document.getElementById('btn-load-demo-saas');
 if(btnLoadDemoSaas) {
-    btnLoadDemoSaas.addEventListener('click', () => {
+    btnLoadDemoSaas.addEventListener('click', async () => {
         // Validación de seguridad SaaS
         const emailMaster = localStorage.getItem('gim_email');
         if(emailMaster !== 'master@fitmanager.com') {
@@ -47,18 +47,24 @@ if(btnLoadDemoSaas) {
         }
 
         if(confirm("¿Estás seguro de que deseas cargar datos de prueba? Esto sobreescribirá los socios actuales de este gimnasio.")) {
-            // Delete current gym socios
-            const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-            window.appData.socios = window.appData.socios.filter(s => s.gym_id !== activeGymId);
-            // Delete payments and ingress
-            window.appData.pagos = window.appData.pagos.filter(p => {
-                const socio = window.appData.socios.find(s => s.dni === p.dni);
-                return socio && socio.gym_id !== activeGymId; // rough logic, should strictly filter
-            });
-            window.generateTestData(true); // defined in app.js
-            setTimeout(() => {
+            try {
+                // Delete current gym socios
+                const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+                window.appData.socios = window.appData.socios.filter(s => s.gym_id !== activeGymId);
+                // Delete payments and ingress
+                window.appData.pagos = window.appData.pagos.filter(p => {
+                    const socio = window.appData.socios.find(s => s.dni === p.dni);
+                    return socio && socio.gym_id !== activeGymId; // rough logic, should strictly filter
+                });
+                
+                await window.generateTestData(true); // wait natively for Firebase to acknowledge the save
+                
+                alert("✅ Los 15 usuarios han sido inyectados y guardados con éxito en la Nube de Firebase.");
                 window.location.reload();
-            }, 1000); // Darle 1 segundo a Firebase para que envíe los datos antes de matar la ventana
+            } catch(e) {
+                console.error(e);
+                alert("❌ Falló la inyección. Firebase devolvió un error de permisos o desconexión. Asegurate de que las Reglas de Firebase digan 'allow read, write: if true;'");
+            }
         }
     });
 }

@@ -112,7 +112,7 @@ window.normalizeText = function(text) {
                .replace(/[\u0300-\u036f]/g, ""); 
 };
 
-window.generateTestData = function(force = false) {
+window.generateTestData = async function(force = false) {
     const activeGymId = Number(localStorage.getItem('gim_gym_id')) || 1;
     if(!force && appData.socios.filter(s => s.gym_id === activeGymId).length > 0) return;
 
@@ -147,7 +147,7 @@ window.generateTestData = function(force = false) {
     }
     // Preservar socios de otros gyms
     appData.socios = [...appData.socios.filter(s => s.gym_id !== activeGymId), ...generatedSocios];
-    appData.save();
+    await appData.save();
 };
 
 window.cleanupDuplicates = function() {
