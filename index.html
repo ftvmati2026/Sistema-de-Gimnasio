@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitManager - Gestión de Gimnasio</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FIREBASE CLOUD SDKs (v10 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-view" class="login-container">
+        <div class="login-split">
+            <div class="login-image">
+                <div class="login-quote">"Más disciplina, menos excusas."</div>
+            </div>
+            <div class="login-card">
+                <div class="login-header">
+                    <i class="ph-fill ph-barbell" style="font-size: 3rem; color: var(--primary); text-shadow: var(--glow);"></i>
+                    <h2 style="font-size: 2rem; font-weight: 800; margin-top: 10px;">FitManager Pro</h2>
+                    <p class="text-secondary mt-2" style="font-size: 0.9rem;">Modern Fitness Management</p>
+                </div>
+            <form id="form-login">
+                <div class="form-group mb-3">
+                    <label>Email</label>
+                    <input type="email" id="login-email" required placeholder="admin@gym.com">
+                </div>
+                <div class="form-group mb-4">
+                    <label>Contraseña</label>
+                    <input type="password" id="login-pass" value="1234" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Ingresar</button>
+            </form>
+            <p class="text-xs text-secondary mt-6" style="text-align:center;">v1.0 SaaS Edition</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA PRINCIPAL (Oculta por defecto) -->
+    <div id="app-view" class="app-container hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ph-fill ph-barbell text-primary"></i>
+                <h2>FitManager</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="dashboard-section"><i class="ph ph-squares-four"></i> Dashboard</li>
+                <li data-target="socios-section"><i class="ph ph-users"></i> Socios</li>
+                <li data-target="agenda-section"><i class="ph ph-calendar-check"></i> Agenda</li>
+                <li data-target="pagos-section"><i class="ph ph-currency-circle-dollar"></i> Pagos</li>
+                <li data-target="acceso-section"><i class="ph ph-scan"></i> Control de Acceso</li>
+                <li data-target="presentes-section"><i class="ph ph-person-simple-walk"></i> Presentes</li>
+                <li data-target="historial-section"><i class="ph ph-clock-counter-clockwise"></i> Historial</li>
+                <li data-target="reportes-section"><i class="ph ph-file-text"></i> Reportes</li>
+                <li data-target="usuarios-section"><i class="ph ph-user-gear"></i> Gestión Staff</li>
+                <li data-target="configuracion-section"><i class="ph ph-gear"></i> Configuración</li>
+                <li data-target="saas-section" id="nav-saas" class="hidden"><i class="ph ph-buildings"></i> Administrar SaaS</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div style="display:flex; flex-direction:column;">
+                    <h2 id="page-title" style="margin:0;">Dashboard</h2>
+                    <p id="active-gym-name" class="text-xs text-primary font-bold" style="text-transform:uppercase; letter-spacing:1px;">Cargando...</p>
+                </div>
+                <div id="real-time-clock" style="font-size:1rem; color:var(--success); font-weight:bold;"></div>
+                <div class="header-user" style="gap:20px; align-items:center;">
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="document.body.className=''; localStorage.setItem('gim_theme', '')" style="width:20px; height:20px; background:#D4AF37; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Black Gold"></button>
+                        <button onclick="document.body.className='theme-neon-green'; localStorage.setItem('gim_theme', 'theme-neon-green')" style="width:20px; height:20px; background:#39FF14; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Neon Green"></button>
+                        <button onclick="document.body.className='theme-yellow-power'; localStorage.setItem('gim_theme', 'theme-yellow-power')" style="width:20px; height:20px; background:#FACC15; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Yellow Power"></button>
+                        <button onclick="document.body.className='light-theme'; localStorage.setItem('gim_theme', 'light-theme')" style="width:20px; height:20px; background:#FFF; border-radius:50%; border:2px solid #333; cursor:pointer;" title="Clean White"></button>
+                    </div>
+                    <div class="user-info" style="display:flex; gap:5px;">
+                        <span class="text-secondary text-sm">Hola,</span>
+                        <strong id="active-user-name">Usuario</strong>
+                    </div>
+                    <button class="btn btn-icon danger" id="btn-logout" title="Cerrar Sesión"><i class="ph ph-sign-out"></i></button>
+                </div>
+            </header>
+
+            <div class="views-wrapper">
+                
+                <!-- SAAS / GLOBAL ADMIN -->
+                <section id="saas-section" class="module-section hidden">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="card">
+                            <h3 class="mb-4">Nuevo Gimnasio (Tenant)</h3>
+                            <form id="form-nuevo-gym">
+                                <div class="form-group mb-3">
+                                    <label>Nombre del Gimnasio</label>
+                                    <input type="text" id="new-gym-name" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label>Dirección</label>
+                                    <input type="text" id="new-gym-address" required>
+                                </div>
+                                <h4 class="mt-4 mb-2">Administrador del Gimnasio</h4>
+                                <div class="form-group mb-3">
+                                    <label>Nombre del Admin</label>
+                                    <input type="text" id="new-gym-admin-name" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label>Email de Admin</label>
+                                    <input type="email" id="new-gym-admin-email" required>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label>Contraseña</label>
+                                    <input type="text" id="new-gym-admin-pass" value="admin123" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">Crear Gimnasio y Admin</button>
+                            </form>
+                        </div>
+                        <div class="card table-responsive">
+                            <h3 class="mb-4">Gimnasios Activos</h3>
+                            <table>
+                                <thead>
+                                    <tr><th>Gimnasio</th><th>ID</th><th>Administrador Principal</th><th>Acciones</th></tr>
+                                </thead>
+                                <tbody id="tabla-gyms-saas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DASHBOARD -->
+                <section id="dashboard-section" class="module-section">
+                    <div class="flex justify-between align-center border-bottom mb-4">
+                        <h2 class="text-xl font-bold" style="padding-bottom:15px;">Resumen General</h2>
+                    </div>
+
+                    <div class="dashboard-hero mb-4" style="background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.2)), url('file:///C:/Users/Usuario/.gemini/antigravity/brain/a1f9b82d-12c0-4419-9434-0068a8fe1df4/dashboard_hero_1773867114374.png') top/cover; height: 250px; border-radius: 20px; display: flex; align-items: center; padding: 40px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <div>
+                            <h2 style="font-size: 2.5rem; font-weight: 800; color: #FFF; margin-bottom: 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.7);">Hoy es día de romperla.</h2>
+                            <p style="color: var(--primary); font-size: 1.1rem; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; text-shadow: var(--glow);">Más disciplina, más resultados</p>
+                        </div>
+                    </div>
+                    <div class="kpi-grid mb-4">
+                        <div class="kpi-card" style="border-left: 4px solid var(--primary);">
+                            <i class="ph-fill ph-money text-primary"></i>
+                            <div><h3>Ingresos del mes</h3><p id="dash-ingresos" style="color:var(--primary); font-size:1.8rem;">$0</p></div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="ph-fill ph-users text-text-main"></i>
+                            <div><h3>Socios activos</h3><p id="dash-activos">0</p></div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 4px solid var(--error);">
+                            <i class="ph-fill ph-warning-circle text-error"></i>
+                            <div><h3>Socios morosos</h3><p id="dash-vencidos" class="text-error">0</p></div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="ph-fill ph-calendar-check text-info"></i>
+                            <div><h3>Asistencias hoy</h3><p id="dash-asistencias-hoy">0</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- USUARIOS DEL SISTEMA -->
+                <section id="usuarios-section" class="module-section hidden">
+                    <div class="section-toolbar mb-4">
+                        <h2 class="text-xl">Gestión de Usuarios</h2>
+                        <button class="btn btn-primary" id="btn-nuevo-usuario"><i class="ph ph-plus"></i> Nuevo Usuario</button>
+                    </div>
+                    <div class="card table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr>
+                            </thead>
+                            <tbody id="tabla-usuarios"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- SOCIOS -->
+                <section id="socios-section" class="module-section hidden">
+                    <div class="section-toolbar" style="gap: 15px;">
+                        <div style="display: flex; gap: 10px; flex: 1;">
+                            <div class="search-box" style="flex: 1;">
+                                <i class="ph ph-magnifying-glass"></i>
+                                <input type="text" id="search-socio" placeholder="Buscar por Nombre o DNI..." style="width: 100%;">
+                            </div>
+                            <select id="filter-socio-status" style="padding: 10px; background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; outline: none;">
+                                <option value="todos">Todos los estados</option>
+                                <option value="al-dia">Al día</option>
+                                <option value="por-vencer">Por vencer</option>
+                                <option value="vencido">Vencidos</option>
+                                <option value="pendiente">Pendiente de pago</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="btn-nuevo-socio"><i class="ph ph-plus"></i> Nuevo Socio</button>
+                    </div>
+                    <div class="card mt-4 table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>Estado</th><th>Nombre y DNI</th><th>Teléfono</th><th>Plan</th><th>Vencimiento</th><th>Acciones</th></tr>
+                            </thead>
+                            <tbody id="tabla-socios"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- REPORTES -->
+                <section id="reportes-section" class="module-section hidden">
+                    <div class="section-toolbar mb-4">
+                        <h2 class="text-xl">Reportes y Estadísticas</h2>
+                    </div>
+                    <div class="grid margin-bottom mb-4" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                        <div class="card">
+                            <h3 class="mb-4" style="padding:15px 15px 0 15px;">Ingresos por Plan</h3>
+                            <div style="padding:15px;"><canvas id="chart-planes" style="max-height: 200px;"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <h3 class="mb-4" style="padding:15px 15px 0 15px;">Asistencia Semanal</h3>
+                            <div style="padding:15px;"><canvas id="chart-asistencia" style="max-height: 200px;"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="panel-header">
+                            <h3>Registro de Actividad Administrativa (Auditoría)</h3>
+                            <p class="text-sm text-secondary">Controla qué empleado o administrador ejecutó acciones sensibles en el sistema.</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr><th>Fecha y Hora</th><th>Usuario / Empleado</th><th>Acción</th><th>Detalle</th></tr>
+                                </thead>
+                                <tbody id="tabla-auditoria"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONFIGURACIÓN -->
+                <section id="configuracion-section" class="module-section hidden">
+                    <div class="section-toolbar mb-4">
+                        <h2 class="text-xl">Configuración del Gimnasio</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="card">
+                            <h3 class="mb-4">Datos del Local</h3>
+                            <form id="form-config-gym">
+                                <div class="form-group mb-3">
+                                    <label>Nombre del Gimnasio</label>
+                                    <input type="text" id="config-gym-name" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label>Dirección</label>
+                                    <input type="text" id="config-gym-address">
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label>Teléfono</label>
+                                    <input type="text" id="config-gym-phone">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3 class="mb-4">Acciones de Sistema</h3>
+                            <p class="text-sm text-secondary mb-4">Estas acciones afectan únicamente a los datos de tu gimnasio actual.</p>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <button class="btn btn-secondary" id="btn-load-demo-saas"><i class="ph ph-magic-wand"></i> Cargar Datos Demo (15 socios)</button>
+                                <button class="btn btn-icon danger w-full" id="btn-reset-system-saas" style="justify-content:center; gap:8px;">
+                                    <i class="ph ph-trash"></i> Resetear Sistema (Borrar Socios/Pagos)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAGOS -->
+                <section id="pagos-section" class="module-section hidden">
+                    <div class="grid-2">
+                        <div class="card panel">
+                            <div class="panel-header"><h3>Registrar Pago</h3></div>
+                            <div class="panel-body">
+                                <form id="form-pago" class="form-grid">
+                                    <div class="form-group" style="grid-column:span 2; position: relative;">
+                                        <label>Buscar Socio (DNI, Nombre o Teléfono)</label>
+                                        <div class="search-box">
+                                            <i class="ph ph-magnifying-glass"></i>
+                                            <input type="text" id="pago-search-socio" placeholder="Escriba para buscar..." style="width: 100%;" autocomplete="off">
+                                        </div>
+                                        <!-- Dropdown de resultados -->
+                                        <div id="pago-search-results" class="hidden" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; z-index: 100; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-top: 5px;"></div>
+                                        <!-- Info del socio seleccionado -->
+                                        <div id="pago-selected-info" class="mt-4 p-4 hidden" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--primary); border-radius: 8px;">
+                                            <p class="text-sm text-secondary">Socio seleccionado:</p>
+                                            <p id="pago-selected-name" class="text-lg font-bold text-primary"></p>
+                                            <p id="pago-selected-details" class="text-sm text-secondary"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Monto</label>
+                                        <input type="number" id="pago-monto" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meses a renovar</label>
+                                        <select id="pago-meses">
+                                            <option value="1">1 Mes</option>
+                                            <option value="3">3 Meses</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="grid-column:span 2;">
+                                        <button type="submit" class="btn btn-primary w-full">Registrar Pago</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card panel">
+                            <div class="panel-header flex justify-between">
+                                <h3>Historial de Pagos</h3>
+                                <select id="filtro-pagos" style="padding: 5px; background: var(--bg-main);">
+                                    <option value="todos">Todos</option>
+                                    <option value="hoy">Hoy</option>
+                                    <option value="mes">Este Mes</option>
+                                </select>
+                            </div>
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="w-full">
+                                    <thead style="position: sticky; top: 0; z-index: 1;">
+                                        <tr>
+                                            <th>Socio</th>
+                                            <th>DNI</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Usuario</th>
+                                            <th>Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-pagos-body" class="text-sm">
+                                        <!-- Filas de pagos -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ACCESO -->
+                <section id="acceso-section" class="module-section hidden">
+                    <div class="grid-2">
+                        <div class="card panel text-center py-4">
+                            <i class="ph-fill ph-scan text-primary" style="font-size:4rem;"></i>
+                            <h2 class="mt-4">Lector de Acceso</h2>
+                            <p class="text-secondary mb-4">Ingrese el DNI del socio</p>
+                            <input type="number" id="acceso-dni" class="w-full text-center text-xl" style="max-width:300px; display:inline-block;" placeholder="DNI...">
+                            <button class="btn btn-primary mx-auto mt-4" id="btn-check-acceso">Verificar DNI</button>
+                            
+                            <div id="acceso-resultado" class="mt-4 hidden p-4" style="border-radius:8px;"></div>
+                        </div>
+                        <div class="card panel">
+                            <div class="panel-header"><h3>Últimos Accesos Hoy</h3></div>
+                            <ul class="list-widget" id="acceso-ultimos"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SOCIOS PRESENTES -->
+                <section id="presentes-section" class="module-section hidden">
+                    <div class="card">
+                        <div class="panel-header">
+                            <h3>Personas Dentro del Gimnasio</h3>
+                            <p class="text-secondary text-sm">Tiempo de sesión predeterminado: 1h 30m</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr><th>Socio</th><th>Hora de Ingreso</th><th>Salida Estimada</th><th>Tiempo Restante</th><th>Acción</th></tr>
+                                </thead>
+                                <tbody id="tabla-presentes"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AGENDA HORARIOS -->
+                <section id="agenda-section" class="module-section hidden">
+                    <div class="card">
+                        <div class="panel-header flex justify-between align-center">
+                            <h3>Agenda del Día (<span id="agenda-fecha"></span>)</h3>
+                            <input type="date" id="agenda-date-picker" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--border); padding: 8px; border-radius: 6px; outline:none; font-family: inherit;">
+                        </div>
+                        <div class="panel-body">
+                            <p class="text-secondary text-sm mb-4">Esta agenda se genera de manera automática según los días y horarios que los socios activos tienen configurados en su ficha. No es editable manualmente.</p>
+                            <div id="agenda-grid" style="display:grid; gap:10px;">
+                                <!-- Bloques de horario -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- HISTORIAL ASISTENCIA -->
+                <section id="historial-section" class="module-section hidden">
+                    <div class="card">
+                        <div class="panel-header flex justify-between align-center">
+                            <h3>Registro Histórico de Asistencia</h3>
+                            <input type="date" id="filtro-fecha-historial" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--border); padding: 5px; border-radius: 6px; outline:none; font-size:0.8rem;">
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr><th>Fecha y Hora</th><th>Socio</th><th>DNI</th><th>Estado al Ingreso</th></tr>
+                                </thead>
+                                <tbody id="tabla-historial-asistencia"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ALERTAS Y RECORDATORIOS -->
+                <section id="alertas-section" class="module-section hidden">
+                    <div class="grid-2 mb-4">
+                        <div class="kpi-card" style="border-left: 3px solid var(--error);">
+                            <i class="ph ph-warning-circle text-error"></i>
+                            <div><h3>Socios Vencidos</h3><p id="alert-cont">0</p></div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 3px solid var(--warning);">
+                            <i class="ph ph-money text-warning"></i>
+                            <div><h3>Dinero Pendiente</h3><p id="alert-money">$0</p></div>
+                        </div>
+                    </div>
+                    <div class="card panel">
+                        <div class="panel-header flex justify-between align-center">
+                            <h3>Listado de Deudores y Recordatorios</h3>
+                            <button class="btn btn-primary" id="btn-whatsapp-all" style="font-size: 0.8rem;"><i class="ph ph-whatsapp-logo"></i> Mensaje General</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="w-full">
+                                <thead><tr><th>Socio</th><th>Vencimiento</th><th>Acción</th></tr></thead>
+                                <tbody id="tabla-alertas-lista"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL SOCIO -->
+    <div id="modal-socio" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Nuevo Socio</h3>
+                <button class="close-modal btn-icon"><i class="ph ph-x"></i></button>
+            </div>
+            <form id="form-socio" class="modal-body form-grid">
+                <input type="hidden" id="socio-id">
+                <div class="form-group"><label>Nombre</label><input type="text" id="socio-nombre" required></div>
+                <div class="form-group"><label>Apellido</label><input type="text" id="socio-apellido" required></div>
+                <div class="form-group"><label>DNI</label><input type="number" id="socio-dni" required></div>
+                <div class="form-group"><label>Teléfono</label><input type="tel" id="socio-tel" required></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Email</label><input type="email" id="socio-email"></div>
+                
+                <div class="form-group"><label>Plan</label><select id="socio-plan"><option value="Pase Libre">Pase Libre</option><option value="Musculación">Musculación</option><option value="Funcional">Funcional</option><option value="Crossfit">Crossfit</option></select></div>
+                <div class="form-group"><label>Límite Ingresos Semanales</label><input type="number" id="socio-limite-semanal" value="3" min="1" max="7" required></div>
+                <div class="form-group"><label>Fecha Inicio</label><input type="date" id="socio-inicio" required></div>
+                
+                <div class="form-group" style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 15px; margin-top:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <label class="font-bold">Asignación de Horarios por Día</label>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-asistencia">
+                            <i class="ph ph-plus"></i> Añadir día y horario
+                        </button>
+                    </div>
+                    <div id="socio-asistencias-container" style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- Las filas se generarán dinámicamente aquí -->
+                    </div>
+                </div>
+
+                <div class="form-group mt-4" style="grid-column: span 2; display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary">Guardar Socio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL USUARIO -->
+    <div id="modal-usuario" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-user-title">Nuevo Usuario</h3>
+                <button class="close-modal-user btn-icon"><i class="ph ph-x"></i></button>
+            </div>
+            <form id="form-usuario" class="modal-body form-grid">
+                <input type="hidden" id="usr-id">
+                <div class="form-group" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="usr-nombre" required></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Email</label><input type="email" id="usr-email" required></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Contraseña</label><input type="password" id="usr-pass" required></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Rol</label><select id="usr-rol"><option value="admin">Administrador</option><option value="recepcion">Recepción</option></select></div>
+                
+                <div class="form-group mt-4" style="grid-column: span 2; display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="modules/usuarios.js"></script>
+    <script src="modules/socios.js"></script>
+    <script src="modules/pagos.js"></script>
+    <script src="modules/acceso.js"></script>
+    <script src="modules/presentes.js"></script>
+    <script src="modules/agenda.js"></script>
+    <script src="modules/dashboard.js"></script>
+    <script src="modules/reportes.js"></script>
+    <script src="modules/recordatorios.js"></script>
+    <script src="modules/configuracion.js"></script>
+    <script src="modules/superadmin.js"></script>
+</body>
+</html>
