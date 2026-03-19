@@ -175,7 +175,7 @@ window.migrateSchedules = function() {
 
 // Eliminamos la generación automática en cada recarga para no pisar el Reset.
 // window.generateTestData();
-window.migrateSchedules();
+// window.migrateSchedules();
 
 // Helpers globales
 window.checkEstado = function(vencimientoStr) {
