@@ -93,37 +93,16 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 }
 .login-card { 
     flex: 1; 
-    padding: 50px; 
+    padding: 30px 60px; 
     display: flex; 
     flex-direction: column; 
-    justify-content: center; 
+    justify-content: flex-start; /* Subir los inputs para que no tapen el logo de la imagen */
     background: #000 url('assets/4.png') no-repeat center center;
     background-size: cover;
     position: relative;
-    border-left: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Estrella decorativa inferior derecha */
-.login-card::after {
-    content: '✦';
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    color: #94A3B8;
-    font-size: 1.5rem;
-    opacity: 0.5;
-}
-
-.login-header { text-align: center; margin-bottom: 40px; }
-.login-header h2 { 
-    color: #D4AF37; 
-    text-transform: uppercase; 
-    letter-spacing: 5px; 
-    font-weight: 400; 
-    margin-top: 15px;
-    font-size: 2.2rem;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
+.login-header { height: 160px; }
 
 .form-group label { 
     color: #D4AF37; 
@@ -133,7 +112,7 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 }
 
 .login-card input {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(0, 0, 0, 0.4);
     border: 1px solid #334155;
     color: #D4AF37;
 }
