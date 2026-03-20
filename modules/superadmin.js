@@ -105,21 +105,21 @@ window.editMasterGym = function(id) {
     }
 };
 
-window.deleteMasterGym = function(id) {
+window.deleteMasterGym = async function(id) {
     if(confirm("🛑 CRÍTICO: ¿Estás ABSOLUTAMENTE SEGURO de querer borrar este gimnasio entero? Se purgarán todos sus administradores, socios, facturación y registros. ESTO ES IRREVERSIBLE.")) {
         // Delete all data associated with this gym
-        window.appData.gyms = window.appData.gyms.filter(g => g.id !== id);
+        window.appData.gyms = window.appData.gyms.filter(g => g.id != id);
         
         // Find member DNIS to safely delete their logs/payments
-        const gymSocioDnis = window.appData.socios.filter(s => s.gym_id === id).map(s => s.dni);
+        const gymSocioDnis = window.appData.socios.filter(s => s.gym_id == id).map(s => String(s.dni));
         
-        window.appData.socios = window.appData.socios.filter(s => s.gym_id !== id);
-        window.appData.usuarios = window.appData.usuarios.filter(u => u.gym_id !== id);
+        window.appData.socios = window.appData.socios.filter(s => s.gym_id != id);
+        window.appData.usuarios = window.appData.usuarios.filter(u => u.gym_id != id);
         
-        window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(p.dni) && p.gym_id !== id);
-        window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(i.dni) && i.gym_id !== id);
+        window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(String(p.dni)) && p.gym_id != id);
+        window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(String(i.dni)) && i.gym_id != id);
         
-        window.appData.save();
+        await window.appData.save();
         renderGimnasios();
     }
 };

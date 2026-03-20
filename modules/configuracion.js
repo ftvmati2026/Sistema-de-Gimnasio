@@ -63,36 +63,45 @@ if(btnLoadDemoSaas) {
 const btnResetSystemSaas = document.getElementById('btn-reset-system-saas');
 if(btnResetSystemSaas) {
     btnResetSystemSaas.addEventListener('click', async () => {
-        // Validación de seguridad para la operación de Reset
         const emailMaster = localStorage.getItem('gim_email');
         if(emailMaster !== 'master@fitmanager.com') {
-            alert("❌ ACCIÓN DESTRUTIVA BLoqUEADA: Por motivos de seguridad, únicamente el Dueño Maestro de Sistemas (Proveedor SaaS) tiene los privilegios para ejecutar un formateo de base de datos.");
+            alert("❌ ACCIÓN DESTRUTIVA BLoqUEADA: Privilegios insuficientes.");
             return;
         }
 
-        if(confirm("⚠️ ADVERTENCIA: Esta acción eliminará DEFINITIVAMENTE todos los socios, pagos y asistencias de tu gimnasio. Esta acción no se puede deshacer. ¿Deseas continuar?")) {
+        if(confirm("⚠️ ¿BORRAR TODO? Se eliminarán Socios, Pagos e Ingresos de este gimnasio.")) {
             try {
-                const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-                
-                // 1. Filtrar Socios
+                const activeGymId = localStorage.getItem('gim_gym_id');
+                btnResetSystemSaas.disabled = true;
+                btnResetSystemSaas.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Procesando Bo rrado...';
+
+                // 1. Filtrar Socios (usando == para evitar líos de String vs Number)
                 const gymSocioDnis = window.appData.socios
-                    .filter(s => s.gym_id === activeGymId)
-                    .map(s => s.dni);
+                    .filter(s => s.gym_id == activeGymId)
+                    .map(s => String(s.dni));
                 
-                window.appData.socios = window.appData.socios.filter(s => s.gym_id !== activeGymId);
+                window.appData.socios = window.appData.socios.filter(s => s.gym_id != activeGymId);
                 
-                // 2. Filtrar Pagos
-                window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(p.dni));
+                // 2. Filtrar Pagos e Ingresos cruzando DNI y/o gym_id si existiera
+                window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(String(p.dni)));
+                window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(String(i.dni)));
                 
-                // 3. Filtrar Ingresos
-                window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(i.dni));
-                
+                // 4. Limpiar Agenda (opcional pero prolijo)
+                if (window.appData.agenda) {
+                    Object.keys(window.appData.agenda).forEach(fecha => {
+                        window.appData.agenda[fecha] = window.appData.agenda[fecha].filter(entry => entry.gym_id != activeGymId);
+                    });
+                }
+
                 await window.appData.save();
-                alert("✅ El sistema ha sido reseteado y los datos fueron eliminados correctamente de la Nube.");
+                
+                alert("✅ Sistema Limpio. Los datos fueron eliminados de la Nube.");
                 window.location.reload();
             } catch(e) {
                 console.error(e);
-                alert("❌ Error al intentar resetear: Firebase no pudo confirmar la eliminación. Verifique su conexión.");
+                btnResetSystemSaas.disabled = false;
+                btnResetSystemSaas.innerHTML = '<i class="ph ph-trash"></i> Resetear Sistema (Borrar Socios/Pagos)';
+                alert("❌ Error: " + e.message);
             }
         }
     });
