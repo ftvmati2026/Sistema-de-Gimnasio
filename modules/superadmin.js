@@ -16,7 +16,7 @@ function renderGimnasios() {
         const blockBtn = `<button class="btn btn-icon ${isAct ? 'danger' : 'text-success'}" onclick="toggleBlockGym(${g.id})" title="${isAct ? 'Bloquear/Desbloquear' : 'Desbloquear'}"><i class="ph ${isAct ? 'ph-lock' : 'ph-lock-open'}"></i></button>`;
         const editBtn = `<button class="btn btn-icon" onclick="editMasterGym(${g.id})" title="Editar"><i class="ph ph-pencil-simple"></i></button>`;
         const delBtn = `<button class="btn btn-icon danger" onclick="deleteMasterGym(${g.id})" title="Eliminar"><i class="ph ph-trash"></i></button>`;
-        const enterBtn = `<button class="btn btn-icon text-primary" onclick="enterGymAdmin(${g.id})" title="Entrar como Admin"><i class="ph ph-sign-in"></i></button>`;
+        const enterBtn = `<button class="btn btn-primary" onclick="enterGymAdmin(${g.id})" title="Entrar como Admin" style="padding: 5px 15px; font-weight: bold; font-size: 13px;">💪 ENTRAR AL SISTEMA</button>`;
 
         tablaGyms.innerHTML += `
             <tr style="${!isAct ? 'opacity:0.5;' : ''}">
