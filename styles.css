@@ -69,7 +69,8 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 }
 .login-image {
     flex: 1;
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    background: url('assets/3.png') no-repeat center center;
+    background-size: cover;
     position: relative;
     display: flex;
     align-items: flex-end;
