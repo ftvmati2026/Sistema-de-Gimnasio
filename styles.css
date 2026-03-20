@@ -93,16 +93,18 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 }
 .login-card { 
     flex: 1; 
-    padding: 30px 60px; 
+    padding: 0 50px 50px 50px; 
     display: flex; 
     flex-direction: column; 
-    justify-content: flex-start; /* Subir los inputs para que no tapen el logo de la imagen */
+    justify-content: flex-start;
     background: #000 url('assets/4.png') no-repeat center center;
     background-size: cover;
     position: relative;
 }
 
-.login-header { height: 160px; }
+.login-header { 
+    width: 100%;
+}
 
 .form-group label { 
     color: #D4AF37; 
@@ -112,7 +114,7 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 }
 
 .login-card input {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid #334155;
     color: #D4AF37;
 }
