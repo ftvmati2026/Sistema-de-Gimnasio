@@ -222,17 +222,19 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
 .cal-day.empty { visibility: hidden; pointer-events: none; }
 
 /* Fondos por Módulo */
-#socios-section {
+#socios-section .card.table-responsive {
     position: relative;
-    min-height: 100%;
+    background: rgba(15, 23, 42, 0.7); /* Fondo oscuro semi-transparente para ver la imagen */
+    overflow: hidden;
 }
-#socios-section::before {
+
+#socios-section .card.table-responsive::before {
     content: '';
     position: absolute;
     inset: 0;
     background: url('assets/2.png') no-repeat center center;
     background-size: cover;
-    opacity: 0.1; /* Super leve para que no moleste a los datos */
+    opacity: 0.15; /* Un poco más de presencia ya que está dentro del cuadro */
     z-index: -1;
     pointer-events: none;
 }
