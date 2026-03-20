@@ -224,19 +224,40 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
 /* Fondos por Módulo */
 #socios-section .card.table-responsive {
     position: relative;
-    background: rgba(15, 23, 42, 0.7); /* Fondo oscuro semi-transparente para ver la imagen */
+    background: rgba(15, 23, 42, 0.85); /* Fondo oscuro muy suave para dejar ver la imagen */
     overflow: hidden;
+    padding-bottom: 0;
 }
 
-#socios-section .card.table-responsive::before {
+#socios-section .card.table-responsive::after {
     content: '';
     position: absolute;
     inset: 0;
     background: url('assets/2.png') no-repeat center center;
     background-size: cover;
-    opacity: 0.15; /* Un poco más de presencia ya que está dentro del cuadro */
-    z-index: -1;
+    opacity: 0.15;
+    z-index: 0; /* Detrás del texto pero delante del fondo del card */
     pointer-events: none;
+}
+
+/* Forzar transparencia en la tabla de socios para que se vea el fondo */
+#socios-section table, 
+#socios-section thead, 
+#socios-section th, 
+#socios-section tr, 
+#socios-section td {
+    background: transparent !important;
+    position: relative;
+    z-index: 1;
+}
+
+#socios-section tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#socios-section th {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--primary); /* Resaltar cabeceras en dorado/verde */
 }
 /* Responsividad */
 @media (max-width: 768px) {
