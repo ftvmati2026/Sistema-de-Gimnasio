@@ -35,6 +35,10 @@ document.addEventListener('module-loaded', (e) => {
     if(e.detail.module === 'saas-section') renderGimnasios();
 });
 
+document.addEventListener('app-data-updated', () => {
+    if(!document.getElementById('saas-section').classList.contains('hidden')) renderGimnasios();
+});
+
 const formNuevoGym = document.getElementById('form-nuevo-gym');
 if(formNuevoGym) {
     formNuevoGym.addEventListener('submit', (e) => {

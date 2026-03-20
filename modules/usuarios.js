@@ -40,6 +40,10 @@ document.addEventListener('module-loaded', (e) => {
     if(e.detail.module === 'usuarios-section') renderUsuarios();
 });
 
+document.addEventListener('app-data-updated', () => {
+    if(!document.getElementById('usuarios-section').classList.contains('hidden')) renderUsuarios();
+});
+
 if(btnNuevoUsr) {
     btnNuevoUsr.addEventListener('click', () => {
         document.getElementById('usr-id').value = '';

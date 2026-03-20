@@ -124,6 +124,10 @@ document.addEventListener('module-loaded', (e) => {
     }
 });
 
+document.addEventListener('app-data-updated', () => {
+    if(!document.getElementById('pagos-section').classList.contains('hidden')) renderPagos();
+});
+
 if(filtroPagos) {
     filtroPagos.addEventListener('change', actualizarListaPagos);
 }

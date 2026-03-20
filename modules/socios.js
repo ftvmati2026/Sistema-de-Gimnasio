@@ -148,6 +148,10 @@ document.addEventListener('module-loaded', (e) => {
         renderSocios();
     }
 });
+
+document.addEventListener('app-data-updated', () => {
+    if(!document.getElementById('socios-section').classList.contains('hidden')) renderSocios();
+});
 searchInput.addEventListener('input', renderSocios);
 if(statusFilter) statusFilter.addEventListener('change', renderSocios);
 
