@@ -91,7 +91,15 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
     font-style: italic;
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
-.login-card { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; background: var(--bg-surface); }
+.login-card { 
+    flex: 1; 
+    padding: 50px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('assets/4.png') no-repeat center center;
+    background-size: cover;
+}
 .login-header { text-align: center; margin-bottom: 30px; }
 
 /* Buttons & Inputs */
