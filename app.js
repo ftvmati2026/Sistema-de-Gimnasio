@@ -49,6 +49,26 @@ window.db.collection('system').doc('masterCloudData').onSnapshot((docSnapshot) =
         window.appData.ingresos = data.ingresos || [];
         window.appData.agenda = data.agenda || {};
         window.appData.auditoria = data.auditoria || [];
+        
+        let needsSave = false;
+        // Restauración Segura: Si la base de datos Cloud está vacía de parámetros esenciales
+        if (window.appData.gyms.length === 0) {
+            window.appData.gyms = [ { id: 1, name: 'SaaS Gym Prime', address: 'Demo', phone: '111' } ];
+            needsSave = true;
+        }
+        if (window.appData.usuarios.length === 0) {
+            window.appData.usuarios = [
+                { id: 1, name: 'SaaS Owner', email: 'master@fitmanager.com', pass: 'master123', rol: 'superadmin', gym_id: 0 },
+                { id: 2, name: 'Admin Principal', email: 'admin@gym.com', pass: '1234', rol: 'admin', gym_id: 1 },
+                { id: 3, name: 'Staff Recepcion', email: 'staff@gym.com', pass: '1234', rol: 'recepcion', gym_id: 1 }
+            ];
+            needsSave = true;
+        }
+
+        if (needsSave) {
+            window.appData.save();
+        }
+
         // Notificar al sistema que llegaron nuevos datos de la nube
         document.dispatchEvent(new CustomEvent('app-data-updated'));
         console.log("Descarga Cloud 🌩️ Recibida en tiempo real.");
