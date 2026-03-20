@@ -89,22 +89,7 @@ window.logActivity = function(actionType, details) {
     window.appData.save();
 };
 
-// Initialization for SaaS Demo
-if(appData.gyms.length === 0) {
-    appData.gyms = [
-        { id: 1, name: 'SaaS Gym Prime', address: 'Av. Libertador 123', phone: '1144556677' }
-    ];
-    appData.save();
-}
-
-if(appData.usuarios.length === 0) {
-    appData.usuarios = [
-        { id: 1, name: 'SaaS Owner', email: 'master@fitmanager.com', pass: 'master123', rol: 'superadmin', gym_id: 0 },
-        { id: 2, name: 'Admin Principal', email: 'admin@gym.com', pass: '1234', rol: 'admin', gym_id: 1 },
-        { id: 3, name: 'Staff Recepcion', email: 'staff@gym.com', pass: '1234', rol: 'recepcion', gym_id: 1 }
-    ];
-    appData.save();
-}
+// Removed rogue global initializations that were wiping Firebase
 
 window.normalizeText = function(text) {
     if(!text) return "";
