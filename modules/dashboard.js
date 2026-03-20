@@ -65,10 +65,14 @@ function renderDashboard() {
     // Boton reset listener
     const btnReset = document.getElementById('btn-reset-demo');
     if(btnReset) {
-        btnReset.onclick = () => {
+        btnReset.onclick = async () => {
             if(confirm("¿Estás seguro? Esto borrará los socios actuales y cargará nuevos de prueba.")) {
-                window.generateTestData(true);
-                window.location.reload();
+                try {
+                    await window.generateTestData(true);
+                    window.location.reload();
+                } catch(e) {
+                    alert("Error al resetear: " + e.message);
+                }
             }
         };
     }

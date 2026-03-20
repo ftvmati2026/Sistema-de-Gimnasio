@@ -62,7 +62,7 @@ if(btnLoadDemoSaas) {
 
 const btnResetSystemSaas = document.getElementById('btn-reset-system-saas');
 if(btnResetSystemSaas) {
-    btnResetSystemSaas.addEventListener('click', () => {
+    btnResetSystemSaas.addEventListener('click', async () => {
         // Validación de seguridad para la operación de Reset
         const emailMaster = localStorage.getItem('gim_email');
         if(emailMaster !== 'master@fitmanager.com') {
@@ -71,26 +71,29 @@ if(btnResetSystemSaas) {
         }
 
         if(confirm("⚠️ ADVERTENCIA: Esta acción eliminará DEFINITIVAMENTE todos los socios, pagos y asistencias de tu gimnasio. Esta acción no se puede deshacer. ¿Deseas continuar?")) {
-            const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-            
-            // Reconstruir arrays excluyendo los de este gimnasio
-            
-            // 1. Filtrar Socios
-            const gymSocioDnis = window.appData.socios
-                .filter(s => s.gym_id === activeGymId)
-                .map(s => s.dni);
-            
-            window.appData.socios = window.appData.socios.filter(s => s.gym_id !== activeGymId);
-            
-            // 2. Filtrar Pagos
-            window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(p.dni));
-            
-            // 3. Filtrar Ingresos
-            window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(i.dni));
-            
-            window.appData.save();
-            alert("El sistema ha sido reseteado y los datos fueron eliminados correctamente.");
-            window.location.reload();
+            try {
+                const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+                
+                // 1. Filtrar Socios
+                const gymSocioDnis = window.appData.socios
+                    .filter(s => s.gym_id === activeGymId)
+                    .map(s => s.dni);
+                
+                window.appData.socios = window.appData.socios.filter(s => s.gym_id !== activeGymId);
+                
+                // 2. Filtrar Pagos
+                window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(p.dni));
+                
+                // 3. Filtrar Ingresos
+                window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(i.dni));
+                
+                await window.appData.save();
+                alert("✅ El sistema ha sido reseteado y los datos fueron eliminados correctamente de la Nube.");
+                window.location.reload();
+            } catch(e) {
+                console.error(e);
+                alert("❌ Error al intentar resetear: Firebase no pudo confirmar la eliminación. Verifique su conexión.");
+            }
         }
     });
 }
