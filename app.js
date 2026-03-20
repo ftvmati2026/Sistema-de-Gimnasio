@@ -156,8 +156,8 @@ window.generateTestData = async function(force = false) {
             asistencias: [{ dia: diaActualCode, hora: '10:00' }, { dia: diaActualCode, hora: '18:00' }]
         });
     }
-    // Preservar socios de otros gyms
-    appData.socios = [...appData.socios.filter(s => s.gym_id !== activeGymId), ...generatedSocios];
+    // Preservar socios de TODOS los gyms (incluyendo los de este mismo gym) y agregar los nuevos
+    appData.socios = [...appData.socios, ...generatedSocios];
     await appData.save();
 };
 

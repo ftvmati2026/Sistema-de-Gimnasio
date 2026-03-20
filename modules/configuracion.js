@@ -46,17 +46,8 @@ if(btnLoadDemoSaas) {
             return;
         }
 
-        if(confirm("¿Estás seguro de que deseas cargar datos de prueba? Esto sobreescribirá los socios actuales de este gimnasio.")) {
+        if(confirm("¿Deseas cargar 15 socios ficticios de prueba? Se añadirán a tus socios actuales.")) {
             try {
-                // Delete current gym socios
-                const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-                window.appData.socios = window.appData.socios.filter(s => s.gym_id !== activeGymId);
-                // Delete payments and ingress
-                window.appData.pagos = window.appData.pagos.filter(p => {
-                    const socio = window.appData.socios.find(s => s.dni === p.dni);
-                    return socio && socio.gym_id !== activeGymId; // rough logic, should strictly filter
-                });
-                
                 await window.generateTestData(true); // wait natively for Firebase to acknowledge the save
                 
                 alert("✅ Inyección confirmada. Refresque la pantalla o espere que los datos se reflejen en la grilla.");
