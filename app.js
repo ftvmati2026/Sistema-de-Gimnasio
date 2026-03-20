@@ -49,10 +49,15 @@ window.db.collection('system').doc('masterCloudData').onSnapshot((docSnapshot) =
         window.appData.ingresos = data.ingresos || [];
         window.appData.agenda = data.agenda || {};
         window.appData.auditoria = data.auditoria || [];
-        
         // Notificar al sistema que llegaron nuevos datos de la nube
         document.dispatchEvent(new CustomEvent('app-data-updated'));
         console.log("Descarga Cloud 🌩️ Recibida en tiempo real.");
+        
+        // INTERVENCIÓN DIAGNÓSTICA EXTREMA ABSOLUTA DIRECTO AL DOM:
+        const headerTitle = document.getElementById('active-gym-name');
+        if(headerTitle) {
+            headerTitle.innerHTML += ` <span style="font-size:10px; color:lime;">[Firebase envió: ${window.appData.socios.length} socios]</span>`;
+        }
     } else {
         // Primera ejecución mundial: Inyectar datos iniciales vacíos en la Nube
         window.appData.gyms = [ { id: 1, name: 'SaaS Gym Prime', address: 'Demo', phone: '111' } ];
