@@ -233,7 +233,7 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
     content: '';
     position: absolute;
     inset: 0;
-    background: url('assets/2.png') no-repeat center center;
+    background: url('assets/3.png') no-repeat center center;
     background-size: cover;
     opacity: 0.15;
     z-index: 0; /* Detrás del texto pero delante del fondo del card */
