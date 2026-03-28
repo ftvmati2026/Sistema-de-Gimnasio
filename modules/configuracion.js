@@ -82,9 +82,12 @@ if(btnResetSystemSaas) {
                 
                 window.appData.socios = window.appData.socios.filter(s => s.gym_id != activeGymId);
                 
-                // 2. Filtrar Pagos e Ingresos cruzando DNI y/o gym_id si existiera
-                window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(String(p.dni)));
-                window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(String(i.dni)));
+                // 2. Filtrar Pagos e Ingresos por gym_id y DNI
+                window.appData.pagos = window.appData.pagos.filter(p => p.gym_id != activeGymId && !gymSocioDnis.includes(String(p.dni)));
+                window.appData.ingresos = window.appData.ingresos.filter(i => i.gym_id != activeGymId && !gymSocioDnis.includes(String(i.dni)));
+                
+                // 3. Limpiar Auditoría del Gimnasio
+                window.appData.auditoria = window.appData.auditoria.filter(a => a.gym_id != activeGymId);
                 
                 // 4. Limpiar Agenda (opcional pero prolijo)
                 if (window.appData.agenda) {

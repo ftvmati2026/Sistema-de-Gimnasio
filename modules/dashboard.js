@@ -26,12 +26,14 @@ function renderDashboard() {
     const activeGymId = Number(localStorage.getItem('gim_gym_id'));
 
     const gymSocios = socios.filter(s => s.gym_id === activeGymId);
-    const gymPagos = pagos.filter(p => !p.gym_id || (() => {
-        // Find if this payment belongs to a socio of this gym
-        // (Since payments didn't save gym_id explicitly, we check via their DNI)
+    const gymPagos = pagos.filter(p => {
+        // PRIORIDAD 1: Por ID de Gimnasio Explícito
+        if(p.gym_id) return p.gym_id === activeGymId;
+        
+        // PRIORIDAD 2: Recurso de legado por DNI (si el pago no tiene gym_id)
         const s = socios.find(so => so.dni === p.dni);
         return s && s.gym_id === activeGymId;
-    })());
+    });
 
     gymSocios.forEach(s => {
         const est = window.checkEstado(s.vencimiento);
@@ -91,7 +93,11 @@ function renderHistorial() {
         .map(s => s.dni);
         
     let logs = [...window.appData.ingresos]
-        .filter(i => eventosPermitidos.includes(i.tipo) && gymSociosDnis.includes(i.dni));
+        .filter(i => {
+            const matchesType = eventosPermitidos.includes(i.tipo);
+            const matchesGym = i.gym_id === activeGymId || gymSociosDnis.includes(i.dni);
+            return matchesType && matchesGym;
+        });
 
     if(filterDate) {
         logs = logs.filter(i => i.fecha.startsWith(filterDate));
