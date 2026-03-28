@@ -27,12 +27,16 @@ function renderDashboard() {
 
     const gymSocios = socios.filter(s => s.gym_id === activeGymId);
     const gymPagos = pagos.filter(p => {
-        // PRIORIDAD 1: Por ID de Gimnasio Explícito
-        if(p.gym_id) return p.gym_id === activeGymId;
+        const pGymId = (p.gym_id !== undefined && p.gym_id !== null) ? Number(p.gym_id) : null;
         
-        // PRIORIDAD 2: Recurso de legado por DNI (si el pago no tiene gym_id)
+        // PRIORIDAD 1: Por ID de Gimnasio Explícito
+        if(pGymId !== null) return pGymId === activeGymId;
+        
+        // PRIORIDAD 2: Recurso de legado por DNI (solo si el gym NO es el master)
+        if(activeGymId === 0) return false;
+        
         const s = socios.find(so => so.dni === p.dni);
-        return s && s.gym_id === activeGymId;
+        return s && Number(s.gym_id) === activeGymId;
     });
 
     gymSocios.forEach(s => {

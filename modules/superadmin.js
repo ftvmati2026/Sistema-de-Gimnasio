@@ -108,16 +108,26 @@ window.editMasterGym = function(id) {
 window.deleteMasterGym = async function(id) {
     if(confirm("🛑 CRÍTICO: ¿Estás ABSOLUTAMENTE SEGURO de querer borrar este gimnasio entero? Se purgarán todos sus administradores, socios, facturación y registros. ESTO ES IRREVERSIBLE.")) {
         // Delete all data associated with this gym
-        window.appData.gyms = window.appData.gyms.filter(g => g.id != id);
+        const gymId = Number(id);
+        window.appData.gyms = window.appData.gyms.filter(g => Number(g.id) !== gymId);
         
         // Find member DNIS to safely delete their logs/payments
-        const gymSocioDnis = window.appData.socios.filter(s => s.gym_id == id).map(s => String(s.dni));
+        const gymSocioDnis = window.appData.socios
+            .filter(s => Number(s.gym_id) === gymId)
+            .map(s => String(s.dni));
         
-        window.appData.socios = window.appData.socios.filter(s => s.gym_id != id);
-        window.appData.usuarios = window.appData.usuarios.filter(u => u.gym_id != id);
+        window.appData.socios = window.appData.socios.filter(s => Number(s.gym_id) !== gymId);
+        window.appData.usuarios = window.appData.usuarios.filter(u => Number(u.gym_id) !== gymId);
         
-        window.appData.pagos = window.appData.pagos.filter(p => !gymSocioDnis.includes(String(p.dni)) && p.gym_id != id);
-        window.appData.ingresos = window.appData.ingresos.filter(i => !gymSocioDnis.includes(String(i.dni)) && i.gym_id != id);
+        window.appData.pagos = window.appData.pagos.filter(p => {
+            const pGymId = (p.gym_id !== undefined && p.gym_id !== null) ? Number(p.gym_id) : null;
+            return pGymId !== gymId && !gymSocioDnis.includes(String(p.dni));
+        });
+        
+        window.appData.ingresos = window.appData.ingresos.filter(i => {
+            const iGymId = (i.gym_id !== undefined && i.gym_id !== null) ? Number(i.gym_id) : null;
+            return iGymId !== gymId && !gymSocioDnis.includes(String(i.dni));
+        });
         
         await window.appData.save();
         renderGimnasios();
