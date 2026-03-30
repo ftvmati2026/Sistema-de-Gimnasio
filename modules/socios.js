@@ -88,10 +88,20 @@ function renderSocios() {
             ? asistencias.map(a => `<span class="badge" style="background:var(--bg-surface); padding:2px 6px;">${a.dia} ${a.hora}</span>`).join(' ') 
             : '-';
 
+        const debitoBadge = s.debito_automatico 
+            ? `<span class="text-primary" title="Débito Automático Activo (Día ${s.debito_dia || 1})"><i class="ph-fill ph-credit-card"></i></span>` 
+            : '';
+
         tablaSocios.innerHTML += `
             <tr>
                 <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-                <td><strong>${s.apellido}, ${s.nombre}</strong><br><span class="text-sm text-secondary">DNI: ${s.dni}</span></td>
+                <td>
+                    <div class="flex align-center gap-2">
+                        <strong>${s.apellido}, ${s.nombre}</strong>
+                        ${debitoBadge}
+                    </div>
+                    <span class="text-sm text-secondary">DNI: ${s.dni}</span>
+                </td>
                 <td>${s.tel || '-'}<br><span class="text-sm text-secondary">${s.email || ''}</span></td>
                 <td>${s.plan} <br><div class="mt-1">${asistenciasFormateadas} <span class="text-xs text-secondary">(${diasTexto})</span></div></td>
                 <td class="${est==='vencido'?'text-error':''}">${window.formatDate(s.vencimiento)}</td>
@@ -205,7 +215,10 @@ formSocio.addEventListener('submit', (e) => {
         plan: document.getElementById('socio-plan').value,
         limite_ingresos_semanales: Number(document.getElementById('socio-limite-semanal').value),
         inicio: document.getElementById('socio-inicio').value,
-        asistencias: asistencias
+        asistencias: asistencias,
+        debito_automatico: document.getElementById('socio-debito-toggle').checked,
+        debito_cbu: document.getElementById('socio-debito-cbu').value,
+        debito_dia: document.getElementById('socio-debito-dia').value
     };
 
     if(idVal) { // Edit
@@ -242,6 +255,18 @@ window.editarSocio = (id) => {
     document.getElementById('socio-limite-semanal').value = s.limite_ingresos_semanales || 3;
     document.getElementById('socio-inicio').value = s.inicio;
     
+    // Débito Automático
+    const toggle = document.getElementById('socio-debito-toggle');
+    toggle.checked = !!s.debito_automatico;
+    document.getElementById('debito-fields').classList.toggle('hidden', !toggle.checked);
+    document.getElementById('socio-debito-cbu').value = s.debito_cbu || '';
+    document.getElementById('socio-debito-dia').value = s.debito_dia || '1';
+    
+    // Toggle Visual
+    const dot = toggle.nextElementSibling.querySelector('span');
+    dot.style.left = toggle.checked ? '27px' : '3px';
+    dot.style.background = toggle.checked ? 'var(--primary)' : 'var(--text-sec)';
+
     // Cargar asistencias
     asistenciasContainer.innerHTML = '';
     if(s.asistencias && s.asistencias.length > 0) {
@@ -264,4 +289,22 @@ window.borrarSocio = (id) => {
         window.appData.save();
         renderSocios();
     }
+}
+
+// Lógica de Toggle Visual
+const debitoToggle = document.getElementById('socio-debito-toggle');
+if(debitoToggle) {
+    debitoToggle.addEventListener('change', (e) => {
+        const dot = e.target.nextElementSibling.querySelector('span');
+        const fields = document.getElementById('debito-fields');
+        if(e.target.checked) {
+            dot.style.left = '27px';
+            dot.style.background = 'var(--primary)';
+            fields.classList.remove('hidden');
+        } else {
+            dot.style.left = '3px';
+            dot.style.background = 'var(--text-sec)';
+            fields.classList.add('hidden');
+        }
+    });
 }

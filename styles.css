@@ -131,6 +131,11 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 .btn-icon { padding: 8px; background: transparent; color: var(--text-sec); font-size: 1.2rem; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; }
 .btn-icon:hover { color: var(--text-main); background: var(--bg-hover); }
 .btn-icon.danger:hover { color: var(--error); background: rgba(239, 68, 68, 0.1); }
+.btn.active { background: var(--primary); color: #FFF; border-color: var(--primary); }
+
+.bg-error-light { background: rgba(239, 68, 68, 0.05) !important; }
+.align-center { align-items: center; }
+.gap-2 { gap: 8px; }
 
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -298,4 +303,22 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
     .sidebar-header { justify-content: center; padding: 20px 0; }
     .nav-links li { justify-content: center; }
     .nav-links li i { font-size: 1.5rem; }
+}
+
+/* Toggle Switch Styles */
+.toggle-switch label span {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.toggle-switch input:checked + label span {
+    left: 27px;
+    background: var(--primary);
+}
+
+#debito-fields {
+    background: rgba(255,255,255,0.02);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+    margin-top: 10px;
 }

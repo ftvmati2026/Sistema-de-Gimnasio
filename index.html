@@ -270,10 +270,17 @@
                 </section>
 
                 <!-- PAGOS -->
-                <section id="pagos-section" class="module-section hidden">
-                    <div class="grid-2">
+                    <div class="section-toolbar mb-4">
+                        <h2 class="text-xl">Gestión de Pagos</h2>
+                        <div class="flex gap-2">
+                            <button class="btn btn-secondary active" id="tab-pago-manual"><i class="ph ph-hand-coins"></i> Pago Manual</button>
+                            <button class="btn btn-secondary" id="tab-pago-debito"><i class="ph ph-credit-card"></i> Débitos Automáticos</button>
+                        </div>
+                    </div>
+                    
+                    <div id="view-pago-manual" class="grid-2">
                         <div class="card panel">
-                            <div class="panel-header"><h3>Registrar Pago</h3></div>
+                            <div class="panel-header"><h3>Registrar Pago Individual</h3></div>
                             <div class="panel-body">
                                 <form id="form-pago" class="form-grid">
                                     <div class="form-group" style="grid-column:span 2; position: relative;">
@@ -299,7 +306,9 @@
                                         <label>Meses a renovar</label>
                                         <select id="pago-meses">
                                             <option value="1">1 Mes</option>
+                                            <option value="2">2 Meses</option>
                                             <option value="3">3 Meses</option>
+                                            <option value="6">6 Meses</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="grid-column:span 2;">
@@ -310,7 +319,7 @@
                         </div>
                         <div class="card panel">
                             <div class="panel-header flex justify-between">
-                                <h3>Historial de Pagos</h3>
+                                <h3>Historial Reciente</h3>
                                 <select id="filtro-pagos" style="padding: 5px; background: var(--bg-main);">
                                     <option value="todos">Todos</option>
                                     <option value="hoy">Hoy</option>
@@ -322,15 +331,42 @@
                                     <thead style="position: sticky; top: 0; z-index: 1;">
                                         <tr>
                                             <th>Socio</th>
-                                            <th>DNI</th>
                                             <th>Fecha</th>
-                                            <th>Hora</th>
                                             <th>Usuario</th>
                                             <th>Monto</th>
                                         </tr>
                                     </thead>
                                     <tbody id="lista-pagos-body" class="text-sm">
                                         <!-- Filas de pagos -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="view-pago-debito" class="hidden">
+                        <div class="card panel">
+                            <div class="panel-header flex justify-between align-center">
+                                <div>
+                                    <h3>Socios Adheridos al Débito</h3>
+                                    <p class="text-sm text-secondary">Listado de socios con débito automático activo que tienen cuotas por cobrar.</p>
+                                </div>
+                                <button class="btn btn-primary" id="btn-procesar-debitos"><i class="ph ph-arrows-merge"></i> Procesar Débitos Masivos</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Socio</th>
+                                            <th>CBU/Alias</th>
+                                            <th>Día Cobro</th>
+                                            <th>Situación</th>
+                                            <th>Monto Sugerido</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-debitos-pendientes">
+                                        <!-- Se cargará por JS -->
                                     </tbody>
                                 </table>
                             </div>
@@ -462,15 +498,33 @@
                 
                 <div class="form-group" style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 15px; margin-top:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <label class="font-bold">Asignación de Horarios por Día</label>
-                        <button type="button" class="btn btn-secondary btn-sm" id="btn-add-asistencia">
-                            <i class="ph ph-plus"></i> Añadir día y horario
-                        </button>
+                        <label class="font-bold flex align-center gap-2">
+                            <i class="ph ph-credit-card text-primary"></i> Débito Automático
+                        </label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="socio-debito-toggle" style="display:none;">
+                            <label for="socio-debito-toggle" style="background: var(--bg-main); border: 1px solid var(--border); width: 50px; height: 26px; border-radius: 13px; position: relative; cursor: pointer; display: block; transition: 0.3s;">
+                                <span style="position: absolute; width: 20px; height: 20px; background: var(--text-sec); border-radius: 50%; top: 2px; left: 3px; transition: 0.3s;"></span>
+                            </label>
+                        </div>
                     </div>
-                    <div id="socio-asistencias-container" style="display:flex; flex-direction:column; gap:10px;">
-                        <!-- Las filas se generarán dinámicamente aquí -->
+                    <div id="debito-fields" class="hidden grid-2" style="gap:10px;">
+                        <div class="form-group">
+                            <label>CBU / CVU / ALIAS</label>
+                            <input type="text" id="socio-debito-cbu" placeholder="000000...">
+                        </div>
+                        <div class="form-group">
+                            <label>Día de Cobro</label>
+                            <select id="socio-debito-dia">
+                                <option value="1">Día 1</option>
+                                <option value="5">Día 5</option>
+                                <option value="10">Día 10</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
+
+                <div class="form-group" style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 15px; margin-top:10px;">
 
                 <div class="form-group mt-4" style="grid-column: span 2; display: flex; justify-content: flex-end;">
                     <button type="submit" class="btn btn-primary">Guardar Socio</button>
