@@ -281,6 +281,7 @@ formPago.addEventListener('submit', (e) => {
 
     window.appData.pagos.push({
         id: Date.now(),
+        gym_id: Number(localStorage.getItem('gim_gym_id')),
         socioId: selectedSocioId,
         nombre: `${s.apellido}, ${s.nombre}`,
         dni: s.dni,

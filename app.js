@@ -209,8 +209,8 @@ if(localStorage.getItem('gim_logged')) {
     loginView.classList.add('hidden');
     appView.classList.remove('hidden');
     const rol = localStorage.getItem('gim_rol').toUpperCase();
-    const gymId = localStorage.getItem('gim_gym_id');
-    const gym = appData.gyms.find(g => g.id == gymId);
+    const gymId = Number(localStorage.getItem('gim_gym_id'));
+    const gym = appData.gyms.find(g => g.id === gymId);
     
     document.getElementById('active-user-name').textContent = localStorage.getItem('gim_user_name');
     
@@ -287,8 +287,8 @@ document.getElementById('form-login').addEventListener('submit', (e) => {
         localStorage.setItem('gim_logged', 'true');
         localStorage.setItem('gim_rol', u.rol);
         localStorage.setItem('gim_user_name', u.name);
-        localStorage.setItem('gim_gym_id', u.gym_id);
-        localStorage.setItem('gim_email', u.email); // Fix applied here
+        localStorage.setItem('gim_gym_id', Number(u.gym_id));
+        localStorage.setItem('gim_email', u.email);
         window.location.reload();
     } else {
         alert('Email o contraseña incorrecta');
