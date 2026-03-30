@@ -23,7 +23,7 @@
                 <div class="login-quote">"Más disciplina, menos excusas."</div>
             </div>
             <div class="login-card">
-                <div class="login-header" style="height: 200px;"></div>
+                <div class="login-header"></div>
                 <form id="form-login">
                     <div class="form-group mb-3"><label>Email</label><input type="email" id="login-email" required placeholder="admin@gym.com"></div>
                     <div class="form-group mb-4"><label>Contraseña</label><input type="password" id="login-pass" value="1234" required></div>
@@ -111,33 +111,200 @@
 
                 <section id="pagos-section" class="module-section hidden">
                     <div class="section-toolbar">
-                        <h2 class="text-xl">Gestión de Pagos</h2>
-                        <div class="flex gap-2" style="background:var(--bg-surface); padding:5px; border-radius:8px;">
-                            <button class="btn btn-sm btn-secondary active" id="tab-pago-manual">Individual</button>
-                            <button class="btn btn-sm btn-secondary" id="tab-pago-debito">Suscripciones</button>
+                        <h2 class="text-xl">Gestión de Cobranzas</h2>
+                        <div class="flex gap-2 p-1 rounded" style="background:var(--bg-surface); border:1px solid var(--border);">
+                            <button class="btn btn-sm btn-secondary active" id="tab-pago-manual">Cobro Individual</button>
+                            <button class="btn btn-sm btn-secondary" id="tab-pago-debito">Suscripciones MP</button>
                         </div>
                     </div>
+
                     <div id="view-pago-manual" class="grid-2">
-                        <div class="card p-4 text-center">
-                            <h3 class="mb-4">Cobrar</h3>
-                            <form id="form-pago" class="form-grid">
-                                <div style="grid-column: span 2; position:relative;"><input type="text" id="pago-search-socio" placeholder="Buscar socio..." style="width:100%;">
-                                <div id="pago-search-results" class="hidden"></div></div>
-                                <div class="form-group"><label>Monto</label><input type="number" id="pago-monto" value="40000" required></div>
-                                <div class="form-group"><label>Meses</label><select id="pago-meses"><option value="1">1</option></select></div>
-                                <button type="submit" class="btn btn-primary w-full" style="grid-column:span 2;">Efectuar Cobro</button>
+                        <div class="card p-6">
+                            <h3 class="mb-4 text-center">Registrar Pago</h3>
+                            <div id="pago-selected-info" class="hidden mb-4 p-4 rounded" style="background:rgba(34,197,94,0.05); border:1px solid var(--primary);">
+                                <div class="flex justify-between align-center">
+                                    <div>
+                                        <p id="pago-selected-name" class="font-bold text-primary"></p>
+                                        <p id="pago-selected-details" class="text-xs text-secondary"></p>
+                                    </div>
+                                    <button class="btn-icon danger" onclick="document.getElementById('pago-selected-info').classList.add('hidden'); window.selectedSocioId=null;"><i class="ph ph-x"></i></button>
+                                </div>
+                            </div>
+                            
+                            <form id="form-pago" class="flex flex-column gap-3">
+                                <div style="position:relative;">
+                                    <label class="text-xs text-secondary mb-1 block">Buscar Socio</label>
+                                    <input type="text" id="pago-search-socio" placeholder="Nombre, Apellido o DNI..." class="w-full">
+                                    <div id="pago-search-results" class="hidden card mt-1" style="position:absolute; width:100%; z-index:10; max-height:200px; overflow-y:auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);"></div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group"><label class="text-xs text-secondary mb-1 block">Monto ($)</label><input type="number" id="pago-monto" value="40000" class="w-full"></div>
+                                    <div class="form-group"><label class="text-xs text-secondary mb-1 block">Meses</label><select id="pago-meses" class="w-full"><option value="1">1 Mes</option><option value="3">3 Meses</option><option value="6">6 Meses</option><option value="12">12 Meses</option></select></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full mt-2">Confirmar Cobro</button>
                             </form>
                         </div>
                         <div class="card p-4">
-                            <h3 class="mb-4">Historial</h3>
-                            <div class="table-responsive"><table><thead><tr><th>Mes</th><th>Monto</th></tr></thead><tbody id="lista-pagos-body"></tbody></table></div>
+                            <div class="flex justify-between align-center mb-4">
+                                <h3>Historial de Caja</h3>
+                                <select id="filtro-pagos" class="btn-secondary" style="padding: 5px 10px; font-size:0.8rem;">
+                                    <option value="todos">Todos</option>
+                                    <option value="hoy">Hoy</option>
+                                    <option value="mes">Este Mes</option>
+                                </select>
+                            </div>
+                            <div class="table-responsive" style="max-height: 400px;">
+                                <table>
+                                    <thead><tr><th>Socio</th><th>Fecha</th><th>Usuario</th><th>Monto</th></tr></thead>
+                                    <tbody id="lista-pagos-body"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+
                     <div id="view-pago-debito" class="hidden">
                         <div class="card p-4">
-                            <div class="flex justify-between mb-4"><h3>Conciliación MP</h3><button class="btn btn-primary btn-sm" id="btn-procesar-debitos">Procesar Todo</button></div>
-                            <div class="table-responsive"><table><thead><tr><th>Socio</th><th>Plan</th><th>Estado</th><th>Accion</th></tr></thead><tbody id="tabla-debitos-pendientes"></tbody></table></div>
+                            <div class="flex justify-between align-center mb-4">
+                                <div>
+                                    <h3>Conciliación Mercado Pago</h3>
+                                    <p class="text-xs text-secondary">Socios con débito automático configurado</p>
+                                </div>
+                                <button class="btn btn-primary" id="btn-procesar-debitos">Procesar Todos los Pendientes</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table>
+                                    <thead><tr><th>Socio</th><th>Plan</th><th>Estado Pago</th><th>Vencimiento</th><th>Acción</th></tr></thead>
+                                    <tbody id="tabla-debitos-pendientes"></tbody>
+                                </table>
+                            </div>
                         </div>
+                    </div>
+                </section>
+
+                <section id="agenda-section" class="module-section hidden">
+                    <div class="section-toolbar">
+                        <h2 class="text-xl">Agenda de Entrenamientos</h2>
+                        <div class="flex gap-2">
+                             <input type="date" id="agenda-date-picker">
+                             <button class="btn btn-secondary" onclick="window.renderAgenda()"><i class="ph ph-arrows-clockwise"></i></button>
+                        </div>
+                    </div>
+                    <div class="card p-4">
+                        <div class="mb-4 flex justify-between align-center">
+                            <h3 id="agenda-fecha" class="text-primary">---</h3>
+                        </div>
+                        <div id="agenda-grid" class="flex flex-column gap-2" style="display:flex; flex-direction:column; gap:10px;">
+                            <!-- Dinámico -->
+                        </div>
+                    </div>
+                </section>
+
+                <section id="acceso-section" class="module-section hidden">
+                    <div class="grid-2">
+                        <div class="card p-6 text-center">
+                            <i class="ph-fill ph-scan text-primary mb-4" style="font-size:4rem;"></i>
+                            <h3 class="mb-4">Control de Ingreso</h3>
+                            <div class="form-group mb-4">
+                                <label>Ingrese DNI del Socio</label>
+                                <input type="number" id="acceso-dni" class="w-full text-center" placeholder="DNI" style="font-size:2rem; padding:15px;">
+                            </div>
+                            <button class="btn btn-primary w-full" id="btn-check-acceso" style="height:60px; font-size:1.2rem;">Verificar Acceso</button>
+                            <div id="acceso-resultado" class="mt-4 p-4 rounded hidden" style="border-radius:10px; min-height:80px;">
+                                <!-- Resultado Dinámico -->
+                            </div>
+                        </div>
+                        <div class="card p-4">
+                            <h3 class="mb-4">Últimos Accesos (Hoy)</h3>
+                            <ul id="acceso-ultimos" class="nav-links" style="background:transparent; padding:0;">
+                                <!-- Dinámico -->
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="presentes-section" class="module-section hidden">
+                    <div class="section-toolbar">
+                        <h2 class="text-xl">Socios en el Gimnasio</h2>
+                    </div>
+                    <div class="card table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Socio</th>
+                                    <th>Ingreso</th>
+                                    <th>Salida Estimada</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-presentes"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="historial-section" class="module-section hidden">
+                    <div class="section-toolbar">
+                        <h2 class="text-xl">Historial de Asistencias</h2>
+                        <input type="date" id="filtro-fecha-historial">
+                    </div>
+                    <div class="card table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Nombre</th>
+                                    <th>DNI</th>
+                                    <th>Tipo de Evento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-historial-asistencia"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="reportes-section" class="module-section hidden">
+                    <div class="grid-2">
+                        <div class="card p-4">
+                            <h3 class="mb-4">Distribución por Plan</h3>
+                            <div style="height:300px;"><canvas id="chart-planes"></canvas></div>
+                        </div>
+                        <div class="card p-4">
+                            <h3 class="mb-4">Asistencia Semanal</h3>
+                            <div style="height:300px;"><canvas id="chart-asistencia"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="card p-4 table-responsive">
+                        <h3 class="mb-4">Bitácora de Auditoría</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Acción</th>
+                                    <th>Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-auditoria"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="usuarios-section" class="module-section hidden">
+                    <div class="section-toolbar">
+                        <h2 class="text-xl">Gestión de Staff</h2>
+                        <button class="btn btn-primary" id="btn-nuevo-usuario">+ Nuevo Usuario</button>
+                    </div>
+                    <div class="card table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre / Email</th>
+                                    <th>Rol</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-usuarios"></tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -185,6 +352,27 @@
                 </div>
                 <div id="socio-asistencias-container" style="grid-column:span 2;"></div>
                 <button type="submit" class="btn btn-primary w-full mt-4" style="grid-column:span 2;">Guardar Todo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL USUARIO -->
+    <div id="modal-usuario" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="modal-user-title">Crear Nuevo Usuario</h3><button class="btn-icon close-modal-user">X</button></div>
+            <form id="form-usuario" class="modal-body form-grid">
+                <input type="hidden" id="usr-id">
+                <div class="form-group mb-3"><label>Nombre Completo</label><input type="text" id="usr-nombre" required></div>
+                <div class="form-group mb-3"><label>Email</label><input type="email" id="usr-email" required></div>
+                <div class="form-group mb-3"><label>Contraseña</label><input type="text" id="usr-pass" required></div>
+                <div class="form-group mb-3">
+                    <label>Rol</label>
+                    <select id="usr-rol" required>
+                        <option value="admin">Administrador</option>
+                        <option value="recepcion">Recepción</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-full mt-4">Guardar Usuario</button>
             </form>
         </div>
     </div>

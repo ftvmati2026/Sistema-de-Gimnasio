@@ -60,6 +60,18 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; width
 .btn-icon { padding: 8px; background: transparent; color: var(--text-sec); cursor: pointer; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; }
 .btn-icon:hover { background: var(--bg-hover); color: var(--text-main); }
 
+.flex-column { flex-direction: column; }
+.align-center { align-items: center; }
+.justify-center { justify-content: center; }
+.rounded { border-radius: 12px; }
+.p-6 { padding: 2.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.gap-1 { gap: 4px; }
+.border-b { border-bottom: 1px solid var(--border); }
+.cursor-pointer { cursor: pointer; }
+.transition-colors { transition: background-color 0.2s ease; }
+.hover\:bg-hover:hover { background-color: var(--bg-hover); }
+
 /* Layout */
 .app-container { display: flex; width: 100%; height: 100%; overflow: hidden; }
 .sidebar { width: 250px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
@@ -67,6 +79,20 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; width
 .nav-links { list-style: none; padding: 20px 10px; overflow-y: auto; flex: 1; }
 .nav-links li { padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-sec); display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
 .nav-links li.active { background: rgba(34, 197, 94, 0.1); color: var(--primary); }
+
+.badge { 
+    padding: 4px 10px; 
+    border-radius: 20px; 
+    font-size: 0.7rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.badge.al-dia { background: rgba(34, 197, 94, 0.1); color: var(--primary); }
+.badge.vencido { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+.badge.por-vencer { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
 
 .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-main); }
 .top-header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-bottom: 1px solid var(--border); background: var(--bg-surface); flex-shrink: 0; }
@@ -95,8 +121,10 @@ th { background: rgba(0,0,0,0.2); color: var(--text-sec); font-size: 0.75rem; te
 .login-container { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; background: #000; }
 .login-split { display: flex; width: 900px; height: 600px; background: var(--bg-surface); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
 .login-image { flex: 1; background: url('assets/1.png') center/cover; position: relative; padding: 40px; display: flex; align-items: flex-end; }
+.login-image::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
 .login-quote { position: relative; z-index: 2; color: #fff; font-size: 1.5rem; font-weight: 700; font-style: italic; }
-.login-card { flex: 1; padding: 50px; background: #000 url('assets/4.png') center/cover; }
+.login-card { flex: 1; padding: 50px; background: #000; display: flex; flex-direction: column; justify-content: center; }
+.login-header { width: 100%; height: 180px; background: url('assets/4.png') center/contain no-repeat; margin-bottom: 30px; }
 
 /* Toggle */
 .toggle-switch input:checked + label span { left: 24px; background: var(--primary); }
