@@ -109,8 +109,33 @@ if(btnResetSystemSaas) {
         if(localStorage.getItem('gim_email') !== 'master@fitmanager.com') {
             alert("No tienes permisos para resetear el sistema global."); return;
         }
-        if(confirm("⚠️ ¿BORRAR TODO? Acción irreversible.")) {
-            // Logic handled here or in superadmin.js
+        if(confirm("⚠️ ¿BORRAR TODO EL SISTEMA? Esta acción eliminará todos los gimnasios, socios y pagos de la red. Es IRREVERSIBLE.")) {
+            window.appData.gyms = [{ id: 1, name: 'SaaS Gym Prime', address: 'Demo', phone: '111' }];
+            window.appData.usuarios = [
+                { id: 1, name: 'SaaS Owner', email: 'master@fitmanager.com', pass: 'master123', rol: 'superadmin', gym_id: 0 },
+                { id: 2, name: 'Admin Principal', email: 'admin@gym.com', pass: '1234', rol: 'admin', gym_id: 1 }
+            ];
+            window.appData.socios = [];
+            window.appData.pagos = [];
+            window.appData.ingresos = [];
+            window.appData.agenda = {};
+            window.appData.auditoria = [];
+            await window.appData.save();
+            alert("Sistema reseteado a valores de fábrica.");
+            window.location.reload();
+        }
+    });
+}
+
+const btnLoadDemo = document.getElementById('btn-load-demo-saas');
+if(btnLoadDemo) {
+    btnLoadDemo.addEventListener('click', async () => {
+        if(confirm("¿Inyectar 15 socios de prueba en este gimnasio?")) {
+            if(window.generateTestData) {
+                await window.generateTestData(true);
+                alert("Datos demo cargados. Recargando...");
+                window.location.reload();
+            }
         }
     });
 }

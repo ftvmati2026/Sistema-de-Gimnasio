@@ -131,7 +131,27 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; displ
 .btn-icon { padding: 8px; background: transparent; color: var(--text-sec); font-size: 1.2rem; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; }
 .btn-icon:hover { color: var(--text-main); background: var(--bg-hover); }
 .btn-icon.danger:hover { color: var(--error); background: rgba(239, 68, 68, 0.1); }
-.btn.active { background: var(--primary); color: #FFF; border-color: var(--primary); }
+
+.btn.active { 
+    background: var(--primary) !important; 
+    color: #000 !important; 
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+
+.tab-links .btn {
+    border: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-links .btn:not(.active) {
+    background: transparent;
+    color: var(--text-sec);
+}
+
+.tab-links .btn:not(.active):hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
 
 .bg-error-light { background: rgba(239, 68, 68, 0.05) !important; }
 .align-center { align-items: center; }
@@ -305,20 +325,24 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
     .nav-links li i { font-size: 1.5rem; }
 }
 
-/* Toggle Switch Styles */
-.toggle-switch label span {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+/* Toggle Switch Animado */
+.toggle-switch label {
+    transition: background 0.3s ease;
 }
-
+.toggle-switch input:checked + label {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border-color: var(--primary) !important;
+}
 .toggle-switch input:checked + label span {
-    left: 27px;
+    left: 24px;
     background: var(--primary);
+    box-shadow: 0 0 10px var(--primary);
 }
 
-#debito-fields {
-    background: rgba(255,255,255,0.02);
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px dashed var(--border);
-    margin-top: 10px;
+/* Fix para evitar estiramiento vertical en los headers */
+.section-toolbar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    min-height: 50px;
 }
