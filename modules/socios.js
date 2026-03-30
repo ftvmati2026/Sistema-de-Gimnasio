@@ -4,32 +4,7 @@ const modalSocio = document.getElementById('modal-socio');
 const formSocio = document.getElementById('form-socio');
 const btnNuevo = document.getElementById('btn-nuevo-socio');
 const searchInput = document.getElementById('search-socio');
-
 const statusFilter = document.getElementById('filter-socio-status');
-
-window.generarLinkWhatsapp = (socio) => {
-    if (!socio.tel) return '#';
-    let rawStr = String(socio.tel);
-    let tel = rawStr.replace(/[^0-9]/g, ''); 
-    if (tel.length === 10) tel = '549' + tel; 
-    
-    // Configurar mensajes segun estado
-    const estado = window.checkEstado(socio.vencimiento);
-    const gymName = document.getElementById('active-gym-name')?.textContent || 'Gimnasio';
-    let mensaje = `Hola ${socio.nombre}! Te escribimos de *${gymName}*. \n\n`;
-
-    if (socio.estado_cuota === 'pendiente') {
-        mensaje += `Te recordamos que tienes pendiente el abono de tu primer cuota para habilitar tu ingreso. ¡Te esperamos por recepción y seguir entrenando a tope!`;
-    } else if (estado === 'vencido') {
-        mensaje += `Queríamos informarte que tu membresía se encuentra *VENCIDA* desde el ${window.formatDate(socio.vencimiento)} 🚨. Por favor, acercate a recepción para regularizar tu situación. ¡Te extrañamos!`;
-    } else if (estado === 'por-vencer') {
-        mensaje += `Nos acercamos por este medio para recordarte que a tu cuota le quedan pocos días y vence el *${window.formatDate(socio.vencimiento)}* 🗓️. ¡Te esperamos para renovar y seguir metiéndole duro!`;
-    } else {
-        mensaje += `Pasamos a saludarte y chequear cómo vienen tus entrenamientos 💪. ¡A seguir rompiéndola!`;
-    }
-
-    return `https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`;
-};
 
 function renderSocios() {
     const sVal = searchInput.value.toLowerCase();
@@ -41,29 +16,17 @@ function renderSocios() {
 
     let filtrados = socios.filter(s => {
         if (s.gym_id !== activeGymId) return false;
-        
         const matchesSearch = s.nombre.toLowerCase().includes(sVal) || s.apellido.toLowerCase().includes(sVal) || s.dni.includes(sVal);
-        
         let matchesStatus = true;
         if (fVal !== 'todos') {
             const actualEst = window.checkEstado(s.vencimiento);
-            if (fVal === 'pendiente') {
-                matchesStatus = s.estado_cuota === 'pendiente';
-            } else {
-                // Si el socio es pendiente, no coincide con otros estados aunque la fecha sea vieja
-                matchesStatus = (s.estado_cuota !== 'pendiente') && (actualEst === fVal);
-            }
+            if (fVal === 'pendiente') matchesStatus = s.estado_cuota === 'pendiente';
+            else matchesStatus = (s.estado_cuota !== 'pendiente') && (actualEst === fVal);
         }
-        
         return matchesSearch && matchesStatus;
     });
     
-    // ORDEN ALFABETICO (Apellido, Nombre)
-    filtrados.sort((a, b) => {
-        const aFull = `${a.apellido} ${a.nombre}`.toLowerCase();
-        const bFull = `${b.apellido} ${b.nombre}`.toLowerCase();
-        return aFull.localeCompare(bFull);
-    });
+    filtrados.sort((a, b) => `${a.apellido} ${a.nombre}`.localeCompare(`${b.apellido} ${b.nombre}`));
     
     if(filtrados.length === 0){
         tablaSocios.innerHTML = '<tr><td colspan="6" class="text-secondary text-center py-4">Socio no encontrado</td></tr>';
@@ -74,22 +37,15 @@ function renderSocios() {
         let est = window.checkEstado(s.vencimiento);
         let badgeText = est.replace('-', ' ');
         let badgeClass = est;
-
-        if (s.estado_cuota === 'pendiente') {
-            est = 'pendiente';
-            badgeText = 'Pendiente de pago';
-            badgeClass = 'pendiente';
-        }
+        if (s.estado_cuota === 'pendiente') { est = 'pendiente'; badgeText = 'Pendiente de pago'; badgeClass = 'pendiente'; }
 
         const asistencias = s.asistencias || [];
-        const cantDias = asistencias.length;
-        const diasTexto = cantDias > 0 ? `${cantDias} veces por semana` : 'Sin días';
         const asistenciasFormateadas = asistencias.length > 0 
             ? asistencias.map(a => `<span class="badge" style="background:var(--bg-surface); padding:2px 6px;">${a.dia} ${a.hora}</span>`).join(' ') 
             : '-';
 
         const debitoBadge = s.debito_automatico 
-            ? `<span class="text-primary" title="Débito Automático Activo (Día ${s.debito_dia || 1})"><i class="ph-fill ph-credit-card"></i></span>` 
+            ? `<span class="text-primary" title="Suscripción MP: ${s.debito_plan || 'Activa'}"><i class="ph-fill ph-credit-card"></i></span>` 
             : '';
 
         tablaSocios.innerHTML += `
@@ -103,15 +59,11 @@ function renderSocios() {
                     <span class="text-sm text-secondary">DNI: ${s.dni}</span>
                 </td>
                 <td>${s.tel || '-'}<br><span class="text-sm text-secondary">${s.email || ''}</span></td>
-                <td>${s.plan} <br><div class="mt-1">${asistenciasFormateadas} <span class="text-xs text-secondary">(${diasTexto})</span></div></td>
+                <td>${s.plan} <br><div class="mt-1">${asistenciasFormateadas}</div></td>
                 <td class="${est==='vencido'?'text-error':''}">${window.formatDate(s.vencimiento)}</td>
                 <td>
                     <button class="btn btn-icon" onclick="editarSocio(${s.id})" title="Editar"><i class="ph ph-pencil-simple"></i></button>
-                    ${s.tel ? 
-                        `<a href="${window.generarLinkWhatsapp(s)}" target="_blank" class="btn btn-icon" style="color: #25D366; text-decoration: none;" title="Recordatorio por WhatsApp"><i class="ph-fill ph-whatsapp-logo"></i></a>` 
-                        : 
-                        `<button class="btn btn-icon" style="color: var(--border); cursor: not-allowed;" title="No tiene número de teléfono cargado" disabled><i class="ph ph-whatsapp-logo"></i></button>`
-                    }
+                    ${s.tel ? `<a href="${window.generarLinkWhatsapp(s)}" target="_blank" class="btn btn-icon" style="color: #25D366;"><i class="ph-fill ph-whatsapp-logo"></i></a>` : ''}
                     <button class="btn btn-icon danger" onclick="borrarSocio(${s.id})" title="Eliminar"><i class="ph ph-trash"></i></button>
                 </td>
             </tr>
@@ -119,93 +71,67 @@ function renderSocios() {
     });
 }
 
-// Lógica de Asistencias Dinámicas
+// Logic for Modal Socio and ASISTENCIAS
 const asistenciasContainer = document.getElementById('socio-asistencias-container');
 const btnAddAsistencia = document.getElementById('btn-add-asistencia');
 
 function addAsistenciaRow(dia = '', hora = '') {
     const row = document.createElement('div');
     row.className = 'asistencia-row';
-    row.style.display = 'grid';
-    row.style.gridTemplateColumns = '1fr 1fr auto';
-    row.style.gap = '10px';
-    row.style.alignItems = 'center';
-
+    row.style = 'display:grid; grid-template-columns:1fr 1fr auto; gap:10px; align-items:center;';
     const dias = ['LU', 'MA', 'MI', 'JU', 'VI', 'SA', 'DO'];
     const horas = Array.from({length: 18}, (_, i) => `${String(i + 6).padStart(2, '0')}:00`);
 
     row.innerHTML = `
-        <select class="asistencia-dia" required style="padding: 5px;">
-            <option value="">-- Día --</option>
-            ${dias.map(d => `<option value="${d}" ${d === dia ? 'selected' : ''}>${d}</option>`).join('')}
-        </select>
-        <select class="asistencia-hora" required style="padding: 5px;">
-            <option value="">-- Hora --</option>
-            ${horas.map(h => `<option value="${h}" ${h === hora ? 'selected' : ''}>${h} hs</option>`).join('')}
-        </select>
-        <button type="button" class="btn btn-icon danger btn-sm" onclick="this.parentElement.remove()" title="Eliminar"><i class="ph ph-minus"></i></button>
+        <select class="asistencia-dia" required style="padding: 5px;"><option value="">-- Día --</option>${dias.map(d => `<option value="${d}" ${d === dia ? 'selected' : ''}>${d}</option>`).join('')}</select>
+        <select class="asistencia-hora" required style="padding: 5px;"><option value="">-- Hora --</option>${horas.map(h => `<option value="${h}" ${h === hora ? 'selected' : ''}>${h} hs</option>`).join('')}</select>
+        <button type="button" class="btn btn-icon danger btn-sm" onclick="this.parentElement.remove()"><i class="ph ph-minus"></i></button>
     `;
     asistenciasContainer.appendChild(row);
 }
+if(btnAddAsistencia) btnAddAsistencia.onclick = () => addAsistenciaRow();
 
-if(btnAddAsistencia) {
-    btnAddAsistencia.onclick = () => addAsistenciaRow();
-}
-
-// Escuchar cambios de modulo
-document.addEventListener('module-loaded', (e) => {
-    if(e.detail.module === 'socios-section') {
-        renderSocios();
-    }
-});
-
-document.addEventListener('app-data-updated', () => {
-    if(!document.getElementById('socios-section').classList.contains('hidden')) renderSocios();
-});
-searchInput.addEventListener('input', renderSocios);
-if(statusFilter) statusFilter.addEventListener('change', renderSocios);
-
-// Formulario ABM
 btnNuevo.addEventListener('click', () => {
     document.getElementById('socio-id').value = '';
     formSocio.reset();
     asistenciasContainer.innerHTML = '';
-    addAsistenciaRow(); // Una fila por defecto
+    addAsistenciaRow(); 
     document.getElementById('modal-title').textContent = 'Crear Nuevo Socio';
     document.getElementById('socio-inicio').value = new Date().toISOString().split('T')[0];
+    
+    // Reset MP Section
+    document.getElementById('debito-fields').classList.add('hidden');
+    document.getElementById('debito-mp-link-box').classList.add('hidden');
+    cargarPlanesDropdown();
+    
     modalSocio.classList.remove('hidden');
 });
 
-document.querySelector('.close-modal').addEventListener('click', () => {
-    modalSocio.classList.add('hidden');
-});
+function cargarPlanesDropdown(seleccionado = '') {
+    const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+    const gym = window.appData.gyms.find(g => g.id === activeGymId);
+    const planes = gym ? (gym.planes || []) : [];
+    const planSelect = document.getElementById('socio-debito-plan');
+    if(!planSelect) return;
+    
+    planSelect.innerHTML = '<option value="">-- Seleccionar Plan --</option>';
+    planes.forEach(p => {
+        planSelect.innerHTML += `<option value="${p.nombre}">${p.nombre} ($${p.monto})</option>`;
+    });
+    planSelect.value = seleccionado;
+}
 
 formSocio.addEventListener('submit', (e) => {
     e.preventDefault();
-    
-    // Colectar asistencias
     const rows = document.querySelectorAll('.asistencia-row');
     const asistencias = Array.from(rows).map(row => ({
         dia: row.querySelector('.asistencia-dia').value,
         hora: row.querySelector('.asistencia-hora').value
     })).filter(a => a.dia && a.hora);
 
-    if (asistencias.length === 0) {
-        alert("Debe asignar al menos un día y horario.");
-        return;
-    }
-
-    // Validar días duplicados (opcional, pero útil)
-    const diasUnicos = new Set(asistencias.map(a => a.dia));
-    if (diasUnicos.size !== asistencias.length) {
-        // En este sistema permitimos múltiples horarios el mismo día? 
-        // El prompt dice "no permitir días duplicados"
-        alert("No se permiten días duplicados. Un socio debe tener un horario por cada día asignado.");
-        return;
-    }
+    if (asistencias.length === 0) { alert("Debe asignar al menos un día y horario."); return; }
 
     const idVal = document.getElementById('socio-id').value;
-
     const sData = {
         dni: document.getElementById('socio-dni').value,
         nombre: document.getElementById('socio-nombre').value,
@@ -217,24 +143,15 @@ formSocio.addEventListener('submit', (e) => {
         inicio: document.getElementById('socio-inicio').value,
         asistencias: asistencias,
         debito_automatico: document.getElementById('socio-debito-toggle').checked,
-        debito_cbu: document.getElementById('socio-debito-cbu').value,
-        debito_dia: document.getElementById('socio-debito-dia').value
+        debito_plan: document.getElementById('socio-debito-plan').value
     };
 
-    if(idVal) { // Edit
+    if(idVal) {
         const idx = window.appData.socios.findIndex(x => x.id == idVal);
         window.appData.socios[idx] = { ...window.appData.socios[idx], ...sData };
-        window.logActivity("EDICION_SOCIO", `Modificó los datos del socio: ${sData.nombre} ${sData.apellido} (${sData.dni})`);
-    } else { // Crear
-        const newS = {
-            id: Date.now(),
-            gym_id: Number(localStorage.getItem('gim_gym_id')),
-            ...sData,
-            estado_cuota: 'pendiente',
-            vencimiento: '' 
-        };
+    } else {
+        const newS = { id: Date.now(), gym_id: Number(localStorage.getItem('gim_gym_id')), ...sData, estado_cuota: 'pendiente', vencimiento: '' };
         window.appData.socios.push(newS);
-        window.logActivity("ALTA_SOCIO", `Registró al nuevo socio: ${sData.nombre} ${sData.apellido} (${sData.dni})`);
     }
 
     window.appData.save();
@@ -255,56 +172,68 @@ window.editarSocio = (id) => {
     document.getElementById('socio-limite-semanal').value = s.limite_ingresos_semanales || 3;
     document.getElementById('socio-inicio').value = s.inicio;
     
-    // Débito Automático
+    cargarPlanesDropdown(s.debito_plan);
     const toggle = document.getElementById('socio-debito-toggle');
     toggle.checked = !!s.debito_automatico;
     document.getElementById('debito-fields').classList.toggle('hidden', !toggle.checked);
-    document.getElementById('socio-debito-cbu').value = s.debito_cbu || '';
-    document.getElementById('socio-debito-dia').value = s.debito_dia || '1';
+    actualizarVistaMP(s.debito_plan);
     
-    // Toggle Visual
-    const dot = toggle.nextElementSibling.querySelector('span');
-    dot.style.left = toggle.checked ? '27px' : '3px';
-    dot.style.background = toggle.checked ? 'var(--primary)' : 'var(--text-sec)';
-
-    // Cargar asistencias
     asistenciasContainer.innerHTML = '';
-    if(s.asistencias && s.asistencias.length > 0) {
-        s.asistencias.forEach(a => addAsistenciaRow(a.dia, a.hora));
-    } else {
-        addAsistenciaRow();
-    }
+    if(s.asistencias && s.asistencias.length > 0) s.asistencias.forEach(a => addAsistenciaRow(a.dia, a.hora));
+    else addAsistenciaRow();
     
     document.getElementById('modal-title').textContent = 'Editar Socio ('+s.dni+')';
     modalSocio.classList.remove('hidden');
 }
 
 window.borrarSocio = (id) => {
-    if(confirm('¿Eliminar socio permanentemente?')) {
-        const target = window.appData.socios.find(x => x.id == id);
-        if(target) {
-            window.logActivity("BAJA_SOCIO", `Eliminó al socio: ${target.nombre} ${target.apellido} (${target.dni})`);
-        }
+    if(confirm('¿Eliminar socio?')) {
         window.appData.socios = window.appData.socios.filter(x => x.id != id);
         window.appData.save();
         renderSocios();
     }
 }
 
-// Lógica de Toggle Visual
-const debitoToggle = document.getElementById('socio-debito-toggle');
-if(debitoToggle) {
-    debitoToggle.addEventListener('change', (e) => {
-        const dot = e.target.nextElementSibling.querySelector('span');
-        const fields = document.getElementById('debito-fields');
-        if(e.target.checked) {
-            dot.style.left = '27px';
-            dot.style.background = 'var(--primary)';
-            fields.classList.remove('hidden');
-        } else {
-            dot.style.left = '3px';
-            dot.style.background = 'var(--text-sec)';
-            fields.classList.add('hidden');
-        }
-    });
+// Logic for Mercado Pago subscription
+function actualizarVistaMP(planNombre) {
+    const box = document.getElementById('debito-mp-link-box');
+    const inputUrl = document.getElementById('socio-debito-mp-url');
+    if(!box || !inputUrl) return;
+    if(!planNombre) { box.classList.add('hidden'); return; }
+
+    const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+    const gym = window.appData.gyms.find(g => g.id === activeGymId);
+    const plan = gym?.planes?.find(p => p.nombre === planNombre);
+
+    if(plan && plan.url) { inputUrl.value = plan.url; box.classList.remove('hidden'); }
+    else box.classList.add('hidden');
 }
+
+document.getElementById('socio-debito-plan')?.addEventListener('change', (e) => actualizarVistaMP(e.target.value));
+
+document.getElementById('btn-copy-mp-link')?.addEventListener('click', () => {
+    const url = document.getElementById('socio-debito-mp-url').value;
+    navigator.clipboard.writeText(url).then(() => alert("¡Link copiado!"));
+});
+
+document.getElementById('btn-wa-mp-subscription')?.addEventListener('click', () => {
+    const url = document.getElementById('socio-debito-mp-url').value;
+    const nombre = document.getElementById('socio-nombre').value;
+    const plan = document.getElementById('socio-debito-plan').value;
+    const tel = document.getElementById('socio-tel').value;
+    if(!tel) { alert("Socio sin teléfono."); return; }
+    const gymName = document.getElementById('active-gym-name')?.textContent || 'Gimnasio';
+    const msg = `¡Hola ${nombre}! Suscribite al *${plan}* de *${gymName}*:\n\n${url}\n\nQuedarás activo luego de pagar.`;
+    let dialTel = String(tel).replace(/[^0-9]/g, '');
+    if(dialTel.length === 10) dialTel = '549' + dialTel;
+    window.open(`https://wa.me/${dialTel}?text=${encodeURIComponent(msg)}`, '_blank');
+});
+
+document.getElementById('socio-debito-toggle')?.addEventListener('change', (e) => {
+    document.getElementById('debito-fields').classList.toggle('hidden', !e.target.checked);
+});
+
+document.addEventListener('module-loaded', (e) => { if(e.detail.module === 'socios-section') renderSocios(); });
+document.addEventListener('app-data-updated', () => { if(!document.getElementById('socios-section').classList.contains('hidden')) renderSocios(); });
+searchInput.addEventListener('input', renderSocios);
+if(statusFilter) statusFilter.addEventListener('change', renderSocios);

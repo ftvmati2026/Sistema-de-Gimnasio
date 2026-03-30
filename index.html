@@ -256,15 +256,16 @@
                                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                             </form>
                         </div>
-                        <div class="card">
-                            <h3 class="mb-4">Acciones de Sistema</h3>
-                            <p class="text-sm text-secondary mb-4">Estas acciones afectan únicamente a los datos de tu gimnasio actual.</p>
-                            <div style="display:flex; flex-direction:column; gap:10px;">
-                                <button class="btn btn-secondary" id="btn-load-demo-saas"><i class="ph ph-magic-wand"></i> Cargar Datos Demo (15 socios)</button>
-                                <button class="btn btn-icon danger w-full" id="btn-reset-system-saas" style="justify-content:center; gap:8px;">
-                                    <i class="ph ph-trash"></i> Resetear Sistema (Borrar Socios/Pagos)
-                                </button>
                             </div>
+                        </div>
+                        <div class="card">
+                            <h3 class="mb-4">Planes de Membresía (Mercado Pago)</h3>
+                            <p class="text-sm text-secondary mb-3">Define tus planes y pega los links de suscripción mensual creados en Mercado Pago.</p>
+                            <div id="config-planes-list" style="display:flex; flex-direction:column; gap:10px;">
+                                <!-- Planes se cargarán aquí -->
+                            </div>
+                            <button class="btn btn-secondary btn-sm mt-3 w-full" id="btn-add-plan-config"><i class="ph ph-plus"></i> Añadir Nuevo Plan</button>
+                            <button class="btn btn-primary mt-3 w-full" id="btn-save-planes">Guardar Planes</button>
                         </div>
                     </div>
                 </section>
@@ -348,20 +349,19 @@
                         <div class="card panel">
                             <div class="panel-header flex justify-between align-center">
                                 <div>
-                                    <h3>Socios Adheridos al Débito</h3>
-                                    <p class="text-sm text-secondary">Listado de socios con débito automático activo que tienen cuotas por cobrar.</p>
+                                    <h3>Conciliación de Suscripciones (MP)</h3>
+                                    <p class="text-sm text-secondary">Si confirmas los cobros en tu cuenta de Mercado Pago, usa esta lista para mantener el sistema al día.</p>
                                 </div>
-                                <button class="btn btn-primary" id="btn-procesar-debitos"><i class="ph ph-arrows-merge"></i> Procesar Débitos Masivos</button>
+                                <button class="btn btn-primary" id="btn-procesar-debitos"><i class="ph ph-check-circle"></i> Confirmar todos los Cobros</button>
                             </div>
                             <div class="table-responsive">
                                 <table>
                                     <thead>
                                         <tr>
                                             <th>Socio</th>
-                                            <th>CBU/Alias</th>
-                                            <th>Día Cobro</th>
-                                            <th>Situación</th>
-                                            <th>Monto Sugerido</th>
+                                            <th>Plan</th>
+                                            <th>Estado Suscripción</th>
+                                            <th>Vencimiento actual</th>
                                             <th>Acción</th>
                                         </tr>
                                     </thead>
@@ -508,18 +508,21 @@
                             </label>
                         </div>
                     </div>
-                    <div id="debito-fields" class="hidden grid-2" style="gap:10px;">
-                        <div class="form-group">
-                            <label>CBU / CVU / ALIAS</label>
-                            <input type="text" id="socio-debito-cbu" placeholder="000000...">
-                        </div>
-                        <div class="form-group">
-                            <label>Día de Cobro</label>
-                            <select id="socio-debito-dia">
-                                <option value="1">Día 1</option>
-                                <option value="5">Día 5</option>
-                                <option value="10">Día 10</option>
+                    <div id="debito-fields" class="hidden" style="margin-top:15px; background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--primary);">
+                        <div class="form-group mb-3">
+                            <label>Seleccionar Plan de Suscripción</label>
+                            <select id="socio-debito-plan">
+                                <option value="">-- Seleccione un plan --</option>
                             </select>
+                        </div>
+                        <div id="debito-mp-link-box" class="hidden">
+                            <label class="text-xs text-secondary">Link de Mercado Pago para enviar:</label>
+                            <div class="flex gap-2 align-center mt-1">
+                                <input type="text" id="socio-debito-mp-url" readonly style="font-size: 0.75rem; flex: 1;">
+                                <button type="button" class="btn btn-icon" id="btn-copy-mp-link" title="Copiar Link"><i class="ph ph-copy"></i></button>
+                                <button type="button" class="btn btn-icon" id="btn-wa-mp-subscription" style="color:#25D366" title="Enviar por WhatsApp"><i class="ph ph-whatsapp-logo"></i></button>
+                            </div>
+                            <p class="text-xs text-info mt-2"><i class="ph ph-info"></i> El socio debe entrar al link y suscribirse para iniciar el débito mensual.</p>
                         </div>
                     </div>
                 </div>

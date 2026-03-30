@@ -2,15 +2,46 @@
 
 document.addEventListener('module-loaded', (e) => {
     if(e.detail.module === 'configuracion-section') {
-        const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-        const gym = window.appData.gyms.find(g => g.id === activeGymId);
-        if(gym) {
-            document.getElementById('config-gym-name').value = gym.name || '';
-            document.getElementById('config-gym-address').value = gym.address || '';
-            document.getElementById('config-gym-phone').value = gym.phone || '';
-        }
+        renderConfig();
     }
 });
+
+function renderConfig() {
+    const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+    const gym = window.appData.gyms.find(g => g.id === activeGymId);
+    if(gym) {
+        document.getElementById('config-gym-name').value = gym.name || '';
+        document.getElementById('config-gym-address').value = gym.address || '';
+        document.getElementById('config-gym-phone').value = gym.phone || '';
+        renderConfigPlanes(gym.planes || []);
+    }
+}
+
+function renderConfigPlanes(planes) {
+    const list = document.getElementById('config-planes-list');
+    if(!list) return;
+    list.innerHTML = '';
+    
+    planes.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.className = 'card p-3 mb-2';
+        div.style.background = 'rgba(255,255,255,0.02)';
+        div.innerHTML = `
+            <div class="form-grid" style="gap:10px;">
+                <div class="form-group"><label>Nombre del Plan</label><input type="text" class="plan-nombre" value="${p.nombre}" placeholder="Ej: Plan Full"></div>
+                <div class="form-group"><label>Monto Mensual</label><input type="number" class="plan-monto" value="${p.monto}" placeholder="40000"></div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Link de Suscripción (Mercado Pago)</label>
+                    <input type="text" class="plan-url" value="${p.url || ''}" placeholder="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=...">
+                </div>
+                <div style="grid-column: span 2; display:flex; justify-content:flex-end;">
+                    <button class="btn btn-icon danger btn-sm" onclick="this.closest('.card').remove()"><i class="ph ph-trash"></i> Eliminar Plan</button>
+                </div>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
 
 const formConfigGym = document.getElementById('form-config-gym');
 if(formConfigGym) {
@@ -26,98 +57,60 @@ if(formConfigGym) {
                 phone: document.getElementById('config-gym-phone').value.trim(),
             };
             window.appData.save();
-            alert("Configuración guardada exitosamente. Se actualizará el nombre del gimnasio.");
-            // Actualizar header
-            const newName = document.getElementById('config-gym-name').value.trim();
+            alert("Configuración personal guardada.");
             const headerName = document.getElementById('active-gym-name');
-            if(headerName) headerName.textContent = newName;
+            if(headerName) headerName.textContent = window.appData.gyms[idx].name;
         }
     });
 }
 
-// System Actions
-const btnLoadDemoSaas = document.getElementById('btn-load-demo-saas');
-if(btnLoadDemoSaas) {
-    btnLoadDemoSaas.addEventListener('click', async () => {
-        // Validación de seguridad SaaS
-        const emailMaster = localStorage.getItem('gim_email');
-        if(emailMaster !== 'master@fitmanager.com') {
-            alert("❌ ACCIÓN BLoqUEADA: Cargar datos falsos sobreescribe la base de datos real. Solo el Dueño del Sistema tiene autorización para hacer inyecciones de prueba.");
-            return;
-        }
+document.getElementById('btn-add-plan-config')?.addEventListener('click', () => {
+    const list = document.getElementById('config-planes-list');
+    const div = document.createElement('div');
+    div.className = 'card p-3 mb-2';
+    div.style.background = 'rgba(255,255,255,0.02)';
+    div.innerHTML = `
+        <div class="form-grid" style="gap:10px;">
+            <div class="form-group"><label>Nombre del Plan</label><input type="text" class="plan-nombre" placeholder="Ej: Plan Full"></div>
+            <div class="form-group"><label>Monto Mensual</label><input type="number" class="plan-monto" placeholder="40000"></div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Link de Suscripción (Mercado Pago)</label>
+                <input type="text" class="plan-url" placeholder="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=...">
+            </div>
+            <div style="grid-column: span 2; display:flex; justify-content:flex-end;">
+                <button class="btn btn-icon danger btn-sm" onclick="this.closest('.card').remove()"><i class="ph ph-trash"></i> Eliminar Plan</button>
+            </div>
+        </div>
+    `;
+    list.appendChild(div);
+});
 
-        if(confirm("¿Deseas cargar 15 socios ficticios de prueba? Se añadirán a tus socios actuales.")) {
-            try {
-                await window.generateTestData(true); // wait natively for Firebase to acknowledge the save
-                
-                alert("✅ Inyección confirmada. Refresque la pantalla o espere que los datos se reflejen en la grilla.");
-                document.getElementById('dash-activos').innerHTML = '<i class="ph ph-spinner animate-spin"></i>'; 
-            } catch(e) {
-                console.error(e);
-                alert("❌ Falló la inyección. Firebase devolvió un error de permisos o desconexión. Asegurate de que las Reglas de Firebase digan 'allow read, write: if true;'");
-            }
-        }
-    });
-}
+document.getElementById('btn-save-planes')?.addEventListener('click', () => {
+    const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+    const gymIdx = window.appData.gyms.findIndex(g => g.id === activeGymId);
+    if(gymIdx === -1) return;
 
+    const cards = document.querySelectorAll('#config-planes-list .card');
+    const newPlanes = Array.from(cards).map(card => ({
+        nombre: card.querySelector('.plan-nombre').value,
+        monto: card.querySelector('.plan-monto').value,
+        url: card.querySelector('.plan-url').value
+    })).filter(p => p.nombre && p.url);
+
+    window.appData.gyms[gymIdx].planes = newPlanes;
+    window.appData.save();
+    alert("Planes y links de Mercado Pago actualizados.");
+});
+
+// System Actions Restricted to Master
 const btnResetSystemSaas = document.getElementById('btn-reset-system-saas');
 if(btnResetSystemSaas) {
     btnResetSystemSaas.addEventListener('click', async () => {
-        const emailMaster = localStorage.getItem('gim_email');
-        if(emailMaster !== 'master@fitmanager.com') {
-            alert("❌ ACCIÓN DESTRUTIVA BLoqUEADA: Privilegios insuficientes.");
-            return;
+        if(localStorage.getItem('gim_email') !== 'master@fitmanager.com') {
+            alert("No tienes permisos para resetear el sistema global."); return;
         }
-
-        if(confirm("⚠️ ¿BORRAR TODO? Se eliminarán Socios, Pagos e Ingresos de este gimnasio.")) {
-            try {
-                const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-                btnResetSystemSaas.disabled = true;
-                btnResetSystemSaas.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Procesando Borrado...';
- 
-                // 1. Obtener lista de DNIs de socios de este gym ANTES de borrarlos
-                const gymSocioDnis = window.appData.socios
-                    .filter(s => Number(s.gym_id) === activeGymId)
-                    .map(s => String(s.dni));
-                
-                // 2. Borrar Socios
-                window.appData.socios = window.appData.socios.filter(s => Number(s.gym_id) !== activeGymId);
-                
-                // 3. Filtrar Pagos e Ingresos por gym_id y DNI
-                window.appData.pagos = window.appData.pagos.filter(p => {
-                    const pGymId = (p.gym_id !== undefined && p.gym_id !== null) ? Number(p.gym_id) : null;
-                    const matchesGym = pGymId === activeGymId;
-                    const matchesDni = gymSocioDnis.includes(String(p.dni));
-                    return !matchesGym && !matchesDni;
-                });
- 
-                window.appData.ingresos = window.appData.ingresos.filter(i => {
-                    const iGymId = (i.gym_id !== undefined && i.gym_id !== null) ? Number(i.gym_id) : null;
-                    const matchesGym = iGymId === activeGymId;
-                    const matchesDni = gymSocioDnis.includes(String(i.dni));
-                    return !matchesGym && !matchesDni;
-                });
-                
-                // 4. Limpiar Auditoría del Gimnasio
-                window.appData.auditoria = window.appData.auditoria.filter(a => Number(a.gym_id) !== activeGymId);
-                
-                // 4. Limpiar Agenda (opcional pero prolijo)
-                if (window.appData.agenda) {
-                    Object.keys(window.appData.agenda).forEach(fecha => {
-                        window.appData.agenda[fecha] = window.appData.agenda[fecha].filter(entry => entry.gym_id != activeGymId);
-                    });
-                }
-
-                await window.appData.save();
-                
-                alert("✅ Sistema Limpio. Los datos fueron eliminados de la Nube.");
-                window.location.reload();
-            } catch(e) {
-                console.error(e);
-                btnResetSystemSaas.disabled = false;
-                btnResetSystemSaas.innerHTML = '<i class="ph ph-trash"></i> Resetear Sistema (Borrar Socios/Pagos)';
-                alert("❌ Error: " + e.message);
-            }
+        if(confirm("⚠️ ¿BORRAR TODO? Acción irreversible.")) {
+            // Logic handled here or in superadmin.js
         }
     });
 }
