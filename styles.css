@@ -138,7 +138,8 @@ body.light-theme th { background: #F3F4F6; color: #374151; }
     flex: 1; 
     display: flex; 
     flex-direction: column; 
-    justify-content: center; 
+    justify-content: flex-end; /* Lo mueve hacia abajo */
+    padding-bottom: 80px;      /* Espacio desde el borde inferior */
     background: url('assets/4.png') center/cover no-repeat; 
     position: relative;
     border-left: 1px solid var(--border); 
