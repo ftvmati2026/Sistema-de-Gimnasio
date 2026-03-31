@@ -23,12 +23,13 @@
                 <div class="login-quote">"Más disciplina, menos excusas."</div>
             </div>
             <div class="login-card">
-                <div class="login-header"></div>
-                <form id="form-login">
-                    <div class="form-group mb-3"><label>Email</label><input type="email" id="login-email" required placeholder="admin@gym.com"></div>
-                    <div class="form-group mb-4"><label>Contraseña</label><input type="password" id="login-pass" value="1234" required></div>
-                    <button type="submit" class="btn btn-primary w-full">Ingresar</button>
-                </form>
+                <div class="login-form-box">
+                    <form id="form-login">
+                        <div class="form-group mb-3"><label>Email</label><input type="email" id="login-email" required placeholder="admin@gym.com"></div>
+                        <div class="form-group mb-4"><label>Contraseña</label><input type="password" id="login-pass" value="1234" required></div>
+                        <button type="submit" class="btn btn-primary w-full">Ingresar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -67,7 +68,7 @@
                 
                 <!-- SIEMPRE UNA MISMA ESTRUCTURA POR SECCION -->
                 <section id="saas-section" class="module-section hidden">
-                    <div class="grid-2">
+                    <div class="flex flex-column gap-5">
                         <div class="card p-4">
                             <h3 class="mb-4">Nuevo Gimnasio</h3>
                             <form id="form-nuevo-gym">
@@ -114,7 +115,6 @@
                         <h2 class="text-xl">Gestión de Cobranzas</h2>
                         <div class="flex gap-2 p-1 rounded" style="background:var(--bg-surface); border:1px solid var(--border);">
                             <button class="btn btn-sm btn-secondary active" id="tab-pago-manual">Cobro Individual</button>
-                            <button class="btn btn-sm btn-secondary" id="tab-pago-debito">Suscripciones MP</button>
                         </div>
                     </div>
 
@@ -162,23 +162,6 @@
                         </div>
                     </div>
 
-                    <div id="view-pago-debito" class="hidden">
-                        <div class="card p-4">
-                            <div class="flex justify-between align-center mb-4">
-                                <div>
-                                    <h3>Conciliación Mercado Pago</h3>
-                                    <p class="text-xs text-secondary">Socios con débito automático configurado</p>
-                                </div>
-                                <button class="btn btn-primary" id="btn-procesar-debitos">Procesar Todos los Pendientes</button>
-                            </div>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead><tr><th>Socio</th><th>Plan</th><th>Estado Pago</th><th>Vencimiento</th><th>Acción</th></tr></thead>
-                                    <tbody id="tabla-debitos-pendientes"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </section>
 
                 <section id="agenda-section" class="module-section hidden">
@@ -340,16 +323,6 @@
                 <input type="text" id="socio-apellido" placeholder="Apellido" required>
                 <input type="number" id="socio-dni" placeholder="DNI" required>
                 <input type="text" id="socio-tel" placeholder="WP">
-                <div style="grid-column: span 2; border-top: 1px solid var(--border); padding-top:10px;">
-                    <div class="flex justify-between mb-2"><label>Debito Automatico</label><input type="checkbox" id="socio-debito-toggle"></div>
-                    <div id="debito-fields" class="hidden">
-                        <select id="socio-debito-plan" style="width:100%;"></select>
-                        <div id="debito-mp-link-box" class="hidden mt-2">
-                            <input type="text" id="socio-debito-mp-url" readonly style="width:100%; font-size:10px;">
-                            <button type="button" class="btn btn-sm w-full mt-2" id="btn-wa-mp-subscription">Mandar Link WP</button>
-                        </div>
-                    </div>
-                </div>
                 <div id="socio-asistencias-container" style="grid-column:span 2;"></div>
                 <button type="submit" class="btn btn-primary w-full mt-4" style="grid-column:span 2;">Guardar Todo</button>
             </form>

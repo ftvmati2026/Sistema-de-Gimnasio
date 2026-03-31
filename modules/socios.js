@@ -44,17 +44,12 @@ function renderSocios() {
             ? asistencias.map(a => `<span class="badge" style="background:var(--bg-surface); padding:2px 6px;">${a.dia} ${a.hora}</span>`).join(' ') 
             : '-';
 
-        const debitoBadge = s.debito_automatico 
-            ? `<span class="text-primary" title="Suscripción MP: ${s.debito_plan || 'Activa'}"><i class="ph-fill ph-credit-card"></i></span>` 
-            : '';
-
         tablaSocios.innerHTML += `
             <tr>
                 <td><span class="badge ${badgeClass}">${badgeText}</span></td>
                 <td>
                     <div class="flex align-center gap-2">
                         <strong>${s.apellido}, ${s.nombre}</strong>
-                        ${debitoBadge}
                     </div>
                     <span class="text-sm text-secondary">DNI: ${s.dni}</span>
                 </td>
@@ -98,28 +93,8 @@ btnNuevo.addEventListener('click', () => {
     addAsistenciaRow(); 
     document.getElementById('modal-title').textContent = 'Crear Nuevo Socio';
     document.getElementById('socio-inicio').value = new Date().toISOString().split('T')[0];
-    
-    // Reset MP Section
-    document.getElementById('debito-fields').classList.add('hidden');
-    document.getElementById('debito-mp-link-box').classList.add('hidden');
-    cargarPlanesDropdown();
-    
     modalSocio.classList.remove('hidden');
 });
-
-function cargarPlanesDropdown(seleccionado = '') {
-    const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-    const gym = window.appData.gyms.find(g => g.id === activeGymId);
-    const planes = gym ? (gym.planes || []) : [];
-    const planSelect = document.getElementById('socio-debito-plan');
-    if(!planSelect) return;
-    
-    planSelect.innerHTML = '<option value="">-- Seleccionar Plan --</option>';
-    planes.forEach(p => {
-        planSelect.innerHTML += `<option value="${p.nombre}">${p.nombre} ($${p.monto})</option>`;
-    });
-    planSelect.value = seleccionado;
-}
 
 formSocio.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -141,9 +116,7 @@ formSocio.addEventListener('submit', (e) => {
         plan: document.getElementById('socio-plan').value,
         limite_ingresos_semanales: Number(document.getElementById('socio-limite-semanal').value),
         inicio: document.getElementById('socio-inicio').value,
-        asistencias: asistencias,
-        debito_automatico: document.getElementById('socio-debito-toggle').checked,
-        debito_plan: document.getElementById('socio-debito-plan').value
+        asistencias: asistencias
     };
 
     if(idVal) {
@@ -172,12 +145,6 @@ window.editarSocio = (id) => {
     document.getElementById('socio-limite-semanal').value = s.limite_ingresos_semanales || 3;
     document.getElementById('socio-inicio').value = s.inicio;
     
-    cargarPlanesDropdown(s.debito_plan);
-    const toggle = document.getElementById('socio-debito-toggle');
-    toggle.checked = !!s.debito_automatico;
-    document.getElementById('debito-fields').classList.toggle('hidden', !toggle.checked);
-    actualizarVistaMP(s.debito_plan);
-    
     asistenciasContainer.innerHTML = '';
     if(s.asistencias && s.asistencias.length > 0) s.asistencias.forEach(a => addAsistenciaRow(a.dia, a.hora));
     else addAsistenciaRow();
@@ -193,45 +160,6 @@ window.borrarSocio = (id) => {
         renderSocios();
     }
 }
-
-// Logic for Mercado Pago subscription
-function actualizarVistaMP(planNombre) {
-    const box = document.getElementById('debito-mp-link-box');
-    const inputUrl = document.getElementById('socio-debito-mp-url');
-    if(!box || !inputUrl) return;
-    if(!planNombre) { box.classList.add('hidden'); return; }
-
-    const activeGymId = Number(localStorage.getItem('gim_gym_id'));
-    const gym = window.appData.gyms.find(g => g.id === activeGymId);
-    const plan = gym?.planes?.find(p => p.nombre === planNombre);
-
-    if(plan && plan.url) { inputUrl.value = plan.url; box.classList.remove('hidden'); }
-    else box.classList.add('hidden');
-}
-
-document.getElementById('socio-debito-plan')?.addEventListener('change', (e) => actualizarVistaMP(e.target.value));
-
-document.getElementById('btn-copy-mp-link')?.addEventListener('click', () => {
-    const url = document.getElementById('socio-debito-mp-url').value;
-    navigator.clipboard.writeText(url).then(() => alert("¡Link copiado!"));
-});
-
-document.getElementById('btn-wa-mp-subscription')?.addEventListener('click', () => {
-    const url = document.getElementById('socio-debito-mp-url').value;
-    const nombre = document.getElementById('socio-nombre').value;
-    const plan = document.getElementById('socio-debito-plan').value;
-    const tel = document.getElementById('socio-tel').value;
-    if(!tel) { alert("Socio sin teléfono."); return; }
-    const gymName = document.getElementById('active-gym-name')?.textContent || 'Gimnasio';
-    const msg = `¡Hola ${nombre}! Suscribite al *${plan}* de *${gymName}*:\n\n${url}\n\nQuedarás activo luego de pagar.`;
-    let dialTel = String(tel).replace(/[^0-9]/g, '');
-    if(dialTel.length === 10) dialTel = '549' + dialTel;
-    window.open(`https://wa.me/${dialTel}?text=${encodeURIComponent(msg)}`, '_blank');
-});
-
-document.getElementById('socio-debito-toggle')?.addEventListener('change', (e) => {
-    document.getElementById('debito-fields').classList.toggle('hidden', !e.target.checked);
-});
 
 document.addEventListener('module-loaded', (e) => { if(e.detail.module === 'socios-section') renderSocios(); });
 document.addEventListener('app-data-updated', () => { if(!document.getElementById('socios-section').classList.contains('hidden')) renderSocios(); });
