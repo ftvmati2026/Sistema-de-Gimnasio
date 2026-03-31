@@ -59,6 +59,9 @@ body { background: var(--bg-main); color: var(--text-main); height: 100vh; width
 .btn.danger { background: var(--error); color: #FFF; }
 .btn-icon { padding: 8px; background: transparent; color: var(--text-sec); cursor: pointer; border-radius: 6px; border: none; display: flex; align-items: center; justify-content: center; }
 .btn-icon:hover { background: var(--bg-hover); color: var(--text-main); }
+.btn-icon.danger { background: var(--error) !important; color: #FFF !important; padding: 10px; }
+.btn-icon.danger:hover { background: #DC2626 !important; transform: scale(1.05); }
+.btn-icon i { font-size: 1.2rem; }
 
 .flex-column { flex-direction: column; }
 .align-center { align-items: center; }
