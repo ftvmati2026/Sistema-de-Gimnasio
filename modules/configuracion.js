@@ -71,35 +71,23 @@ if(btnResetSystemSaas) {
 
         if(confirm("⚠️ ¿BORRAR TODO? Se eliminarán Socios, Pagos e Ingresos de este gimnasio.")) {
             try {
-                const activeGymId = Number(localStorage.getItem('gim_gym_id'));
+                const activeGymId = localStorage.getItem('gim_gym_id');
                 btnResetSystemSaas.disabled = true;
-                btnResetSystemSaas.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Procesando Borrado...';
- 
-                // 1. Obtener lista de DNIs de socios de este gym ANTES de borrarlos
+                btnResetSystemSaas.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Procesando Bo rrado...';
+
+                // 1. Filtrar Socios (usando == para evitar líos de String vs Number)
                 const gymSocioDnis = window.appData.socios
-                    .filter(s => Number(s.gym_id) === activeGymId)
+                    .filter(s => s.gym_id == activeGymId)
                     .map(s => String(s.dni));
                 
-                // 2. Borrar Socios
-                window.appData.socios = window.appData.socios.filter(s => Number(s.gym_id) !== activeGymId);
+                window.appData.socios = window.appData.socios.filter(s => s.gym_id != activeGymId);
                 
-                // 3. Filtrar Pagos e Ingresos por gym_id y DNI
-                window.appData.pagos = window.appData.pagos.filter(p => {
-                    const pGymId = (p.gym_id !== undefined && p.gym_id !== null) ? Number(p.gym_id) : null;
-                    const matchesGym = pGymId === activeGymId;
-                    const matchesDni = gymSocioDnis.includes(String(p.dni));
-                    return !matchesGym && !matchesDni;
-                });
- 
-                window.appData.ingresos = window.appData.ingresos.filter(i => {
-                    const iGymId = (i.gym_id !== undefined && i.gym_id !== null) ? Number(i.gym_id) : null;
-                    const matchesGym = iGymId === activeGymId;
-                    const matchesDni = gymSocioDnis.includes(String(i.dni));
-                    return !matchesGym && !matchesDni;
-                });
+                // 2. Filtrar Pagos e Ingresos por gym_id y DNI
+                window.appData.pagos = window.appData.pagos.filter(p => p.gym_id != activeGymId && !gymSocioDnis.includes(String(p.dni)));
+                window.appData.ingresos = window.appData.ingresos.filter(i => i.gym_id != activeGymId && !gymSocioDnis.includes(String(i.dni)));
                 
-                // 4. Limpiar Auditoría del Gimnasio
-                window.appData.auditoria = window.appData.auditoria.filter(a => Number(a.gym_id) !== activeGymId);
+                // 3. Limpiar Auditoría del Gimnasio
+                window.appData.auditoria = window.appData.auditoria.filter(a => a.gym_id != activeGymId);
                 
                 // 4. Limpiar Agenda (opcional pero prolijo)
                 if (window.appData.agenda) {
