@@ -23,8 +23,8 @@ function renderGimnasios() {
                 <td><strong>${g.name}</strong><br><span class="text-xs text-secondary">${g.address}</span></td>
                 <td><span class="badge" style="background:var(--bg-hover); color:var(--text-sec); border:1px solid var(--border);">${g.id}</span></td>
                 <td>${adminText}</td>
-                <td style="display:flex; gap:5px; align-items:center;">
-                    ${enterBtn} ${editBtn} ${blockBtn} ${delBtn}
+                <td>
+                    <div class="flex">${enterBtn} ${editBtn} ${blockBtn} ${delBtn}</div>
                 </td>
             </tr>
         `;

@@ -30,7 +30,7 @@ function renderUsuarios() {
             <tr>
                 <td><strong>${u.name || u.nombre}</strong><br><span class="text-xs text-secondary">${u.email}</span></td>
                 <td><span class="badge" style="background:var(--bg-hover); color:var(--text-sec); border:1px solid var(--border);">${rolText}</span></td>
-                <td>${acts}</td>
+                <td><div class="flex">${acts}</div></td>
             </tr>
         `;
     });
