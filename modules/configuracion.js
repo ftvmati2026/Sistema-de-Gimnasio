@@ -127,7 +127,6 @@ if(btnResetSystemSaas) {
     });
 }
 
-<<<<<<< HEAD
 const btnLoadDemo = document.getElementById('btn-load-demo-saas');
 if(btnLoadDemo) {
     btnLoadDemo.addEventListener('click', async () => {
@@ -135,38 +134,6 @@ if(btnLoadDemo) {
             if(window.generateTestData) {
                 await window.generateTestData(true);
                 alert("Datos demo cargados. Recargando...");
-=======
-        if(confirm("⚠️ ¿BORRAR TODO? Se eliminarán Socios, Pagos e Ingresos de este gimnasio.")) {
-            try {
-                const activeGymId = localStorage.getItem('gim_gym_id');
-                btnResetSystemSaas.disabled = true;
-                btnResetSystemSaas.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Procesando Bo rrado...';
-
-                // 1. Filtrar Socios (usando == para evitar líos de String vs Number)
-                const gymSocioDnis = window.appData.socios
-                    .filter(s => s.gym_id == activeGymId)
-                    .map(s => String(s.dni));
-                
-                window.appData.socios = window.appData.socios.filter(s => s.gym_id != activeGymId);
-                
-                // 2. Filtrar Pagos e Ingresos por gym_id y DNI
-                window.appData.pagos = window.appData.pagos.filter(p => p.gym_id != activeGymId && !gymSocioDnis.includes(String(p.dni)));
-                window.appData.ingresos = window.appData.ingresos.filter(i => i.gym_id != activeGymId && !gymSocioDnis.includes(String(i.dni)));
-                
-                // 3. Limpiar Auditoría del Gimnasio
-                window.appData.auditoria = window.appData.auditoria.filter(a => a.gym_id != activeGymId);
-                
-                // 4. Limpiar Agenda (opcional pero prolijo)
-                if (window.appData.agenda) {
-                    Object.keys(window.appData.agenda).forEach(fecha => {
-                        window.appData.agenda[fecha] = window.appData.agenda[fecha].filter(entry => entry.gym_id != activeGymId);
-                    });
-                }
-
-                await window.appData.save();
-                
-                alert("✅ Sistema Limpio. Los datos fueron eliminados de la Nube.");
->>>>>>> parent of f61b693 (error)
                 window.location.reload();
             }
         }

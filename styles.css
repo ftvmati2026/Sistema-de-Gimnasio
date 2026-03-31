@@ -11,6 +11,7 @@
     --shadow: 0 4px 15px rgba(0,0,0,0.4);
     --hero-bg: linear-gradient(135deg, #0F172A 0%, var(--primary) 100%);
     --hero-text: #FFFFFF;
+    --login-overlay: rgba(0, 0, 0, 0.75);
 }
 
 body.light-theme {
@@ -26,6 +27,7 @@ body.light-theme {
     --shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
     --hero-bg: linear-gradient(135deg, #EF4444 0%, #FFFFFF 100%);
     --hero-text: #FFFFFF;
+    --login-overlay: rgba(255, 255, 255, 0.85);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -130,7 +132,7 @@ th { background: rgba(0,0,0,0.4); color: var(--text-sec); font-size: 0.75rem; te
 body.light-theme th { background: #F1F5F9; color: var(--text-sec); }
 
 /* Login */
-.login-container { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; background: #000; }
+.login-container { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; background: var(--bg-main); }
 .login-split { display: flex; width: 1100px; height: 650px; background: var(--bg-surface); border-radius: 24px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
 .login-image { flex: 1; background: url('assets/1.png') center/cover no-repeat; position: relative; padding: 40px; display: flex; align-items: flex-end; }
 .login-image::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); }
@@ -149,7 +151,7 @@ body.light-theme th { background: #F1F5F9; color: var(--text-sec); }
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75); /* Capa para legibilidad */
+    background: var(--login-overlay); /* Capa para legibilidad */
     z-index: 1;
 }
 .login-form-box { 
@@ -198,7 +200,7 @@ body.light-theme .dashboard-hero p { color: #FFF !important; }
 /* Fondos por Módulo */
 #socios-section .card.table-responsive {
     position: relative;
-    background: #0F172A; /* Fondo oscuro fijo para que la imagen 3 de fondo se vea bien y el texto blanco resalte */
+    background: var(--bg-surface); 
     overflow: hidden;
     padding-bottom: 0;
 }
@@ -214,24 +216,19 @@ body.light-theme .dashboard-hero p { color: #FFF !important; }
     pointer-events: none;
 }
 
-/* Forzar legibilidad: Blanco siempre sobre el fondo oscuro de socios */
 #socios-section table, 
 #socios-section thead, 
 #socios-section th, 
 #socios-section tr, 
 #socios-section td,
-#socios-section strong,
-#socios-section .text-secondary {
+#socios-section strong {
     background: transparent !important;
     position: relative;
     z-index: 1;
-    color: #FFF !important;
 }
-body.light-theme #socios-section table,
-body.light-theme #socios-section td,
-body.light-theme #socios-section strong {
-    color: #FFF !important; /* Mantener blanco sobre la imagen de fondo de socios */
-}
+/* Forzar legibilidad: Solo en modo oscuro forzamos blanco si es necesario, pero mejor dejar que fluya */
+#socios-section .text-secondary { color: var(--text-sec); }
+
 #socios-section .badge { color: inherit !important; } 
 
 /* Específico para Legibilidad de Horarios en Modo Claro */
@@ -247,8 +244,8 @@ body.light-theme #socios-section .badge {
 }
 
 #socios-section th {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--primary); /* Resaltar cabeceras en dorado/verde */
+    border-bottom: 1px solid var(--border);
+    color: var(--primary); 
 }
 
 /* Responsividad */
