@@ -217,6 +217,7 @@ if(localStorage.getItem('gim_logged')) {
     if (rol === 'SUPERADMIN') {
         document.getElementById('active-gym-name').textContent = 'CONTROL CENTRAL SaaS';
         document.getElementById('nav-saas').classList.remove('hidden');
+        document.getElementById('nav-prospeccion').classList.remove('hidden');
         
         // Hide all regular gym menus
         navLinks.forEach(l => {
@@ -235,7 +236,7 @@ if(localStorage.getItem('gim_logged')) {
             if(rol === 'RECEPCION' && restrictedForStaff.includes(target)) {
                 l.style.display = 'none';
             }
-            if(target === 'saas-section') l.style.display = 'none';
+            if(target === 'saas-section' || target === 'prospeccion-section') l.style.display = 'none';
         });
 
         setTimeout(() => {
