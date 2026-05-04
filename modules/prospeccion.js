@@ -22,10 +22,10 @@ const LEADS_INICIALES = [
 const GUION_DIRECTO = "¡Hola! Somos de FitManager, ayudamos a gimnasios a recuperar socios perdidos con IA.";
 
 function renderProspeccion() {
-    const tabla = document.getElementById('tabla-prospeccion');
-    if (!tabla) return;
-
-    tabla.innerHTML = '';
+    const tbody = document.getElementById('leads-body');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
     
     LEADS_INICIALES.forEach((lead, index) => {
         const tr = document.createElement('tr');

@@ -219,13 +219,17 @@ if(localStorage.getItem('gim_logged')) {
         document.getElementById('nav-saas').classList.remove('hidden');
         document.getElementById('nav-prospeccion').classList.remove('hidden');
         
-        // Hide all regular gym menus
+        // Mostrar menús de administración y ocultar los de gimnasio regular
         navLinks.forEach(l => {
-            if (l.getAttribute('id') !== 'nav-saas') {
+            const id = l.getAttribute('id');
+            if (id === 'nav-saas' || id === 'nav-prospeccion') {
+                l.style.display = 'flex';
+                l.classList.remove('hidden');
+            } else {
                 l.style.display = 'none';
             }
         });
-        setTimeout(() => { document.querySelector('[data-target="saas-section"]').click(); }, 100);
+        setTimeout(() => { document.getElementById('nav-saas').click(); }, 100);
     } else {
         document.getElementById('active-gym-name').textContent = gym ? gym.name : 'Mi Gimnasio';
         
