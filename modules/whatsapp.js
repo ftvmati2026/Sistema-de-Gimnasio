@@ -1,4 +1,11 @@
-import TWILIO_CONFIG from '../config/secrets.js';
+let TWILIO_CONFIG = null;
+
+try {
+    const module = await import('../config/secrets.js');
+    TWILIO_CONFIG = module.default;
+} catch (e) {
+    console.warn('⚠️ Archivo de secretos no encontrado. La automatización de WhatsApp estará desactivada.');
+}
 
 /**
  * Función para enviar mensajes de WhatsApp a través de la API de Twilio.
@@ -6,6 +13,10 @@ import TWILIO_CONFIG from '../config/secrets.js';
  * @param {string} body - Contenido del mensaje
  */
 export async function enviarWhatsAppIA(to, body) {
+    if (!TWILIO_CONFIG) {
+        return { success: false, error: 'Configuración de Twilio no encontrada en este entorno.' };
+    }
+
     const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_CONFIG.accountSid}/Messages.json`;
     
     // Formatear el número de destino para WhatsApp
