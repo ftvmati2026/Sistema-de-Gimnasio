@@ -248,14 +248,14 @@ if(localStorage.getItem('gim_logged')) {
 // Tema y Reloj Global
 const btnTheme = document.getElementById('btn-theme');
 if (localStorage.getItem('gim_theme') === 'light-theme') {
-    document.body.className = 'light-theme';
+    document.documentElement.classList.add('light-theme');
     if(btnTheme) btnTheme.innerHTML = '<i class="ph ph-moon"></i>';
 } else {
-    document.body.className = '';
+    document.documentElement.classList.remove('light-theme');
 }
 if(btnTheme) {
     btnTheme.addEventListener('click', () => {
-        const isLight = document.body.classList.toggle('light-theme');
+        const isLight = document.documentElement.classList.toggle('light-theme');
         localStorage.setItem('gim_theme', isLight ? 'light-theme' : '');
         btnTheme.innerHTML = isLight ? '<i class="ph ph-moon"></i>' : '<i class="ph ph-sun"></i>';
     });

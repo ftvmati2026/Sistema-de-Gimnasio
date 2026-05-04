@@ -21,7 +21,7 @@
     --info: #3B82F6;
 }
 
-body.light-theme {
+:root.light-theme {
     /* MODO CLARO */
     --bg-main: #F8FAFC;
     --bg-surface: #FFFFFF;
