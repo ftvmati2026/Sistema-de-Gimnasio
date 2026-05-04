@@ -48,6 +48,7 @@
                 <li data-target="historial-section"><i class="ph ph-clock-counter-clockwise"></i><span>Historial</span></li>
                 <li data-target="reportes-section"><i class="ph ph-file-text"></i><span>Reportes</span></li>
                 <li data-target="ia-section" class="text-primary font-bold"><i class="ph-fill ph-magic-wand"></i><span>Consultor IA</span></li>
+                <li data-target="prospeccion-section" class="text-primary"><i class="ph ph-briefcase"></i><span>Prospección</span></li>
                 <li data-target="usuarios-section"><i class="ph ph-user-gear"></i><span>Staff</span></li>
                 <li data-target="configuracion-section"><i class="ph ph-gear"></i><span>Configuración</span></li>
                 <li data-target="saas-section" id="nav-saas" class="hidden"><i class="ph ph-shield-check"></i><span>SaaS</span></li>
@@ -349,6 +350,50 @@
                     </div>
                 </section>
 
+                <section id="prospeccion-section" class="module-section hidden">
+                    <div class="ia-hero">
+                        <div class="flex align-center gap-3 mb-2">
+                            <i class="ph ph-briefcase text-primary" style="font-size: 2.5rem;"></i>
+                            <h2 class="text-2xl">Buscador de Clientes (Leads)</h2>
+                        </div>
+                        <p class="text-secondary">Aquí tienes gimnasios reales listos para ser contactados hoy mismo.</p>
+                    </div>
+
+                    <div class="card table-responsive mt-6">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Gimnasio</th>
+                                    <th>Dirección</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-prospeccion">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Modal Guion de Venta -->
+                    <div id="modal-guion" class="modal hidden">
+                        <div class="modal-content" style="width: 600px;">
+                            <div class="modal-header">
+                                <h3 id="guion-gym-name">Guion de Venta</h3>
+                                <button class="btn-icon" onclick="document.getElementById('modal-guion').classList.add('hidden')">X</button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-xs text-secondary mb-4">Copia este mensaje y mándalo por WhatsApp para iniciar la conversación:</p>
+                                <div class="p-4 rounded border bg-surface" id="guion-texto" style="white-space: pre-wrap; font-size: 0.9rem;"></div>
+                                <div class="flex gap-2 mt-4">
+                                    <button class="btn btn-primary w-full" id="btn-copy-guion"><i class="ph ph-copy"></i> Copiar Guion</button>
+                                    <button class="btn btn-success w-full" id="btn-open-wa" style="background:#25D366; color:white;"><i class="ph ph-whatsapp-logo"></i> Abrir WA</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="usuarios-section" class="module-section hidden">
                     <div class="section-toolbar">
                         <h2 class="text-xl">Gestión de Staff</h2>
@@ -437,6 +482,7 @@
     <script src="modules/dashboard.js?v=999"></script>
     <script src="modules/reportes.js?v=999"></script>
     <script src="modules/ia_consultor.js?v=999"></script>
+    <script src="modules/prospeccion.js?v=999"></script>
     <script src="modules/configuracion.js?v=999"></script>
     <script src="modules/superadmin.js?v=999"></script>
 </body>
