@@ -289,3 +289,79 @@ body.light-theme #socios-section .badge {
     .nav-links li i { font-size: 1.5rem; }
 }
 
+
+/* IA MODULE STYLES */
+.ia-hero {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, var(--bg-card) 100%);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ia-hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
+    z-index: 0;
+}
+
+.border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+                linear-gradient(135deg, var(--primary), #8b5cf6) border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.border-gradient:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.churn-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 12px;
+}
+
+.churn-card .socio-info p {
+    margin: 0;
+}
+
+.btn-whatsapp-small {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-whatsapp-small:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+}
+
+@keyframes pulse-ai {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.btn-primary i.ph-sparkle {
+    animation: pulse-ai 2s infinite;
+}

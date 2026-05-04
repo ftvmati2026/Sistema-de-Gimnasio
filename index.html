@@ -47,6 +47,7 @@
                 <li data-target="presentes-section"><i class="ph ph-person-simple-walk"></i><span>Presentes</span></li>
                 <li data-target="historial-section"><i class="ph ph-clock-counter-clockwise"></i><span>Historial</span></li>
                 <li data-target="reportes-section"><i class="ph ph-file-text"></i><span>Reportes</span></li>
+                <li data-target="ia-section" class="text-primary font-bold"><i class="ph-fill ph-magic-wand"></i><span>Consultor IA</span></li>
                 <li data-target="usuarios-section"><i class="ph ph-user-gear"></i><span>Staff</span></li>
                 <li data-target="configuracion-section"><i class="ph ph-gear"></i><span>Configuración</span></li>
                 <li data-target="saas-section" id="nav-saas" class="hidden"><i class="ph ph-shield-check"></i><span>SaaS</span></li>
@@ -272,6 +273,82 @@
                     </div>
                 </section>
 
+                <!-- NUEVO MODULO: CONSULTOR IA -->
+                <section id="ia-section" class="module-section hidden">
+                    <div class="ia-hero">
+                        <div class="flex align-center gap-3 mb-2">
+                            <i class="ph-fill ph-magic-wand text-primary" style="font-size: 2.5rem;"></i>
+                            <h2 class="text-2xl">Consultor IA de Crecimiento</h2>
+                        </div>
+                        <p class="text-secondary">Usa la inteligencia artificial para vender más y retener a tus socios.</p>
+                    </div>
+
+                    <div class="grid-2 mt-6">
+                        <!-- Generador de Contenido -->
+                        <div class="card p-6 border-gradient">
+                            <h3 class="mb-4 flex align-center gap-2"><i class="ph ph-megaphone text-primary"></i> Generador de Marketing</h3>
+                            <div class="flex flex-column gap-4">
+                                <div class="form-group">
+                                    <label>¿Qué quieres lograr?</label>
+                                    <select id="ia-copy-goal" class="w-full">
+                                        <option value="venta">Atraer nuevos socios (Venta)</option>
+                                        <option value="recuperacion">Recuperar socios que dejaron de venir</option>
+                                        <option value="vencimiento">Recordatorio de vencimiento (Amigable)</option>
+                                        <option value="motivacion">Motivación semanal para activos</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tono del mensaje</label>
+                                    <select id="ia-copy-tone" class="w-full">
+                                        <option value="profesional">Profesional y serio</option>
+                                        <option value="energico">Enérgico y motivador</option>
+                                        <option value="cercano">Cercano y amigable</option>
+                                        <option value="urgente">Urgencia (Oferta limitada)</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-full" id="btn-ia-generate">
+                                    <i class="ph ph-sparkle"></i> Generar Estrategia y Copy
+                                </button>
+                                
+                                <div id="ia-copy-result" class="hidden mt-4 p-4 rounded bg-surface border">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-xs font-bold text-primary uppercase">Propuesta de la IA</span>
+                                        <button class="btn-icon btn-sm" id="btn-copy-ia"><i class="ph ph-copy"></i></button>
+                                    </div>
+                                    <div id="ia-text-output" class="text-sm whitespace-pre-wrap"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analista de Retención -->
+                        <div class="card p-6 border-gradient">
+                            <h3 class="mb-4 flex align-center gap-2"><i class="ph ph-trend-down text-error"></i> Alerta de Abandono (Churn)</h3>
+                            <p class="text-xs text-secondary mb-4">Socios que no asisten hace más de 10 días pero tienen plan activo.</p>
+                            <div id="ia-retencion-list" class="flex flex-column gap-3">
+                                <!-- Dinámico -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-6 mt-6 border-gradient">
+                        <h3 class="mb-4 flex align-center gap-2"><i class="ph ph-rocket-launch text-primary"></i> Plan de Acción "Vende Hoy"</h3>
+                        <div class="grid-3 gap-4">
+                            <div class="p-4 rounded border" style="background: rgba(var(--primary-rgb), 0.05);">
+                                <h4 class="text-primary mb-2">1. Captación</h4>
+                                <p class="text-xs">Usa el generador para crear un post de "Semana de Prueba" y compártelo en tus estados.</p>
+                            </div>
+                            <div class="p-4 rounded border" style="background: rgba(var(--primary-rgb), 0.05);">
+                                <h4 class="text-primary mb-2">2. Seguimiento</h4>
+                                <p class="text-xs">Contacta a los 5 socios con más riesgo de abandono usando el botón de WhatsApp rápido.</p>
+                            </div>
+                            <div class="p-4 rounded border" style="background: rgba(var(--primary-rgb), 0.05);">
+                                <h4 class="text-primary mb-2">3. Fidelización</h4>
+                                <p class="text-xs">Envía un mensaje de motivación a quienes asistieron más de 3 veces esta semana.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="usuarios-section" class="module-section hidden">
                     <div class="section-toolbar">
                         <h2 class="text-xl">Gestión de Staff</h2>
@@ -359,6 +436,7 @@
     <script src="modules/agenda.js?v=999"></script>
     <script src="modules/dashboard.js?v=999"></script>
     <script src="modules/reportes.js?v=999"></script>
+    <script src="modules/ia_consultor.js?v=999"></script>
     <script src="modules/configuracion.js?v=999"></script>
     <script src="modules/superadmin.js?v=999"></script>
 </body>
