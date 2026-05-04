@@ -1,4 +1,5 @@
-// ================= PROSPECCION MODULE ================= 
+import { cargarModulo } from '../app.js';
+import { enviarWhatsAppIA } from './whatsapp.js';
 
 const LEADS_INICIALES = [
     { name: 'Lifefit', address: 'Bogotá 70, Caballito', tel: '5491155842998', ig: '@lifefitcaba', status: 'Pendiente' },
@@ -7,16 +8,18 @@ const LEADS_INICIALES = [
     { name: 'Fitness King 2', address: 'Lavalle 4070, Almagro', tel: '5491138803320', ig: '@fitnesskingym2', status: 'Pendiente' },
     { name: 'GoBox Caballito', address: 'Av. Acoyte 67, Caballito', tel: '5491139183294', ig: '@gobox.caballito', status: 'Pendiente' },
     { name: 'Well Club Arenales', address: 'Arenales 3674, Palermo', tel: '541124617033', ig: '@wellclub_oficial_', status: 'Pendiente' },
-    { name: 'Nitro Gym Palermo', address: 'Av. Córdoba 3358, Palermo', tel: '541171050925', ig: '@nitrogymm', status: 'Pendiente' },
-    { name: 'Omnia Fitness Center', address: 'Fitz Roy 2261, Palermo', tel: '541147734444', ig: '@omniafitnesscenter', status: 'Pendiente' },
-    { name: 'Gym Belgrano', address: 'O\'Higgins 2133, Belgrano', tel: '541147868250', ig: '@gymbelgrano', status: 'Pendiente' },
-    { name: 'Always Fitness Belgrano', address: 'Av. Cabildo 3140, Belgrano', tel: '541147021845', ig: '@alwaysfitnessbelgrano', status: 'Pendiente' },
+    { name: 'Nitro Gym Palermo', address: 'Av. Córdoba 3358, Palermo', tel: '5491122631726', ig: '@nitrogymm', status: 'Pendiente' },
+    { name: 'Omnia Fitness Center', address: 'Fitz Roy 2261, Palermo', tel: '5491156294609', ig: '@omniafitnesscenter', status: 'Pendiente' },
+    { name: 'Gym Belgrano', address: 'O\'Higgins 2133, Belgrano', tel: '5491124665704', ig: '@gymbelgrano', status: 'Pendiente' },
+    { name: 'Always Fitness Belgrano', address: 'Av. Cabildo 3140, Belgrano', tel: '5491164185254', ig: '@alwaysfitnessbelgrano', status: 'Pendiente' },
     { name: 'Iron Gym Villa Crespo', address: 'Aguirre 849, Villa Crespo', tel: '541147714712', ig: '@irongym00', status: 'Pendiente' },
     { name: 'Gym Ares Villa Crespo', address: 'Av. Corrientes 5240, Villa Crespo', tel: '541148548501', ig: '@gym_ares', status: 'Pendiente' },
     { name: 'Always Fitness Recoleta', address: 'Pueyrredón 1215, Recoleta', tel: '541149640010', ig: '@alwaysfitnessrecoleta', status: 'Pendiente' },
     { name: 'Gimnasio Cero', address: 'Pacheco de Melo 2045, Recoleta', tel: '541148014475', ig: '@gimnasiocero', status: 'Pendiente' },
     { name: 'Magnum Gym Recoleta', address: 'Junín 1057, Recoleta', tel: '541148216547', ig: '@magnumgym_recoleta', status: 'Pendiente' }
 ];
+
+const GUION_DIRECTO = "¡Hola! Somos de FitManager, ayudamos a gimnasios a recuperar socios perdidos con IA.";
 
 function renderProspeccion() {
     const tabla = document.getElementById('tabla-prospeccion');
@@ -28,19 +31,42 @@ function renderProspeccion() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
-                <strong>${lead.name}</strong><br>
-                <a href="https://instagram.com/${lead.ig.replace('@','')}" target="_blank" class="text-xs text-primary">${lead.ig}</a>
+                <div class="font-bold">${lead.name}</div>
+                <div class="text-xs text-secondary">${lead.ig}</div>
             </td>
             <td class="text-sm text-secondary">${lead.address}</td>
             <td><span class="badge" style="background:var(--bg-hover);">${lead.status}</span></td>
             <td>
                 <div class="flex gap-2">
-                    <button class="btn btn-sm btn-primary" onclick="window.verGuion(${index})"><i class="ph ph-chat-text"></i> Guion</button>
-                    <button class="btn btn-sm btn-secondary" onclick="window.marcarContactado(${index})"><i class="ph ph-check"></i></button>
+                    <a href="https://api.whatsapp.com/send?phone=${lead.tel}&text=${encodeURIComponent(GUION_DIRECTO)}" 
+                       target="_blank" class="btn btn-sm btn-secondary">Manual</a>
+                    <button class="btn btn-sm btn-primary btn-ia" data-tel="${lead.tel}">✨ IA</button>
                 </div>
             </td>
         `;
         tabla.appendChild(tr);
+    });
+
+    document.querySelectorAll('.btn-ia').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const tel = e.currentTarget.getAttribute('data-tel');
+            const originalText = e.currentTarget.innerHTML;
+            
+            e.currentTarget.disabled = true;
+            e.currentTarget.innerHTML = '...';
+
+            const result = await enviarWhatsAppIA(tel, GUION_DIRECTO);
+
+            if (result.success) {
+                e.currentTarget.innerHTML = '✅';
+            } else {
+                e.currentTarget.innerHTML = '❌';
+                setTimeout(() => {
+                    e.currentTarget.disabled = false;
+                    e.currentTarget.innerHTML = originalText;
+                }, 2000);
+            }
+        });
     });
 }
 

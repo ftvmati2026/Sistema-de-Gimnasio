@@ -1,0 +1,8 @@
+# Ignorar archivos con claves sensibles
+config/secrets.js
+
+# Ignorar archivos de Excel y temporales
+*.csv
+*.xlsx
+.DS_Store
+node_modules/
