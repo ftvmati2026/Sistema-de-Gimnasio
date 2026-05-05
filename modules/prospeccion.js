@@ -1,5 +1,5 @@
-import { cargarModulo } from '../app.js';
-import { enviarWhatsAppIA } from './whatsapp.js';
+// ================= PROSPECCION MODULE ================= 
+
 
 const LEADS_INICIALES = [
     { name: 'Lifefit', address: 'Bogotá 70, Caballito', tel: '5491155842998', ig: '@lifefitcaba', status: 'Pendiente' },
@@ -55,7 +55,7 @@ function renderProspeccion() {
             e.currentTarget.disabled = true;
             e.currentTarget.innerHTML = '...';
 
-            const result = await enviarWhatsAppIA(tel, GUION_DIRECTO);
+            const result = await window.enviarWhatsAppIA(tel, GUION_DIRECTO);
 
             if (result.success) {
                 e.currentTarget.innerHTML = '✅';

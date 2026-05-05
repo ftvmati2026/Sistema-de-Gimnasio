@@ -217,12 +217,11 @@ if(localStorage.getItem('gim_logged')) {
     if (rol === 'SUPERADMIN') {
         document.getElementById('active-gym-name').textContent = 'CONTROL CENTRAL SaaS';
         document.getElementById('nav-saas').classList.remove('hidden');
-        document.getElementById('nav-prospeccion').classList.remove('hidden');
         
         // Mostrar menús de administración y ocultar los de gimnasio regular
         navLinks.forEach(l => {
             const id = l.getAttribute('id');
-            if (id === 'nav-saas' || id === 'nav-prospeccion') {
+            if (id === 'nav-saas') {
                 l.style.display = 'flex';
                 l.classList.remove('hidden');
             } else {
@@ -314,7 +313,7 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 const moduleSections = document.querySelectorAll('.module-section');
 const pageTitle = document.getElementById('page-title');
 
-export function cargarModulo(target) {
+function cargarModulo(target) {
     navLinks.forEach(l => l.classList.remove('active'));
     moduleSections.forEach(s => s.classList.add('hidden'));
     
