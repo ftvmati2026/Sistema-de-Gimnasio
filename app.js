@@ -314,17 +314,22 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 const moduleSections = document.querySelectorAll('.module-section');
 const pageTitle = document.getElementById('page-title');
 
+export function cargarModulo(target) {
+    navLinks.forEach(l => l.classList.remove('active'));
+    moduleSections.forEach(s => s.classList.add('hidden'));
+    
+    const link = Array.from(navLinks).find(l => l.getAttribute('data-target') === target);
+    if(link) link.classList.add('active');
+    
+    document.getElementById(target).classList.remove('hidden');
+    pageTitle.textContent = link ? link.textContent.trim() : 'Dashboard';
+
+    document.dispatchEvent(new CustomEvent('module-loaded', { detail: { module: target } }));
+}
+
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
-        navLinks.forEach(l => l.classList.remove('active'));
-        moduleSections.forEach(s => s.classList.add('hidden'));
-        
-        link.classList.add('active');
         const target = link.getAttribute('data-target');
-        document.getElementById(target).classList.remove('hidden');
-        pageTitle.textContent = link.textContent.trim();
-
-        // Disparar Eventos Custom para refrescar cada modulo
-        document.dispatchEvent(new CustomEvent('module-loaded', { detail: { module: target } }));
+        cargarModulo(target);
     });
 });

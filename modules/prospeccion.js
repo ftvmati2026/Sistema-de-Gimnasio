@@ -44,7 +44,7 @@ function renderProspeccion() {
                 </div>
             </td>
         `;
-        tabla.appendChild(tr);
+        tbody.appendChild(tr);
     });
 
     document.querySelectorAll('.btn-ia').forEach(btn => {
